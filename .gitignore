@@ -1,0 +1,9 @@
+# Các thư mục cấu hình và cache của Agent
+.gemini/
+.system_generated/
+*.log
+transcript.jsonl
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
