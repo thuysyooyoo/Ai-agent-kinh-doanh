@@ -3,9 +3,8 @@
 # ==========================================
 
 # 1. Đường dẫn kho lưu trữ (Repository) trên GitHub của bạn:
-# (Mặc định em đã cấu hình kho "Ngoc-thuy" sẵn có của anh/chị. 
-# Nếu anh/chị muốn đổi sang kho khác, hãy thay thế link dưới đây)
-GITHUB_REPO_URL=https://github.com/thuysyooyoo/Ngoc-thuy.git
+# (Đã cập nhật sang kho mới của anh/chị: Ai-agent-kinh-doanh)
+GITHUB_REPO_URL=https://github.com/thuysyooyoo/Ai-agent-kinh-doanh.git
 
 # 2. Khoảng thời gian tự động kiểm tra thay đổi và đồng bộ (tính bằng giây):
 # Mặc định 60 giây (1 phút) để kiểm tra cho nhanh. Anh/chị có thể đổi thành 300 (5 phút).
