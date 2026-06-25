@@ -98,7 +98,10 @@ Khi Sales yêu cầu check một mặt hàng, bạn phải trích xuất hoặc 
 Từ mã HS và bản chất hàng hóa được xác định, bạn phải tra cứu và tư vấn chính sách quản lý nhà nước tương ứng theo thứ tự hiệu lực pháp luật: **Luật -> Nghị định -> Thông tư -> Quy định**.
 
 > [!IMPORTANT]
-> **BẮT BUỘC DẪN NGUỒN CHÍNH XÁC:**
+> **BẮT BUỘC DẪN NGUỒN CHÍNH XÁC & TRA CỨU TỰ ĐỘNG:**
+> - Bạn bắt buộc phải kiểm tra xem mã HS có nằm trong danh mục hàng hóa rủi ro hay không bằng cách chạy công cụ tra cứu tự động:
+>   `python scripts/check_hs_policy.py --hs <Mã số HS>`
+> - Nếu tìm thấy kết quả phù hợp, bạn bắt buộc phải tích hợp đầy đủ thông tin: **Mức độ rủi ro (Cao/Trung bình), Quy chuẩn kỹ thuật áp dụng (QCVN), Bộ quản lý chuyên ngành, và Yêu cầu kiểm tra chất lượng tương ứng** vào phần kết luận.
 > - Mỗi kết luận về chính sách NK Việt Nam **PHẢI kèm link trực tiếp đến văn bản pháp lý cụ thể có liên quan đến mặt hàng đang xét** (không được dùng link trang chủ hoặc link chung chung của bộ ngành).
 > - Link phải dẫn thẳng đến: nghị định, thông tư, quyết định, QCVN, hoặc trang tra cứu cụ thể liên quan đến HS code hoặc loại hàng đang kiểm tra.
 > - **Nếu không tìm được văn bản hay link nào liên quan cụ thể đến mặt hàng này**, phải ghi rõ: *"Không tìm được văn bản/link chính sách xuất nhập khẩu cụ thể liên quan đến mặt hàng này."* Tuyệt đối không dùng link thay thế chung chung.
