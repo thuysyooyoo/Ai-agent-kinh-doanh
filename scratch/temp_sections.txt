@@ -1,0 +1,151 @@
+1: chứng nhận bởi tổ chức chứng nhận, hoạt động chứng nhận được thực hiện theo quy
+2: định tại <a name="tc_4">Điều 6</a> và <a name="bieumau_pl_02_2" class='clsBookmark_bm clsopentLogin' onmouseover = "LS_Tip(28,0)" onmouseout="hideddrivetip();">Phụ lục II</a>
+3: của Thông tư này;</span></p>
+4: 
+5: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+6: style='font-size:10.0pt;font-family:"Arial",sans-serif'>2. Kết quả đánh giá hợp
+7: quy quy định tại điểm a khoản 1 Điều này là căn cứ để tổ chức, cá nhân công bố
+8: hợp quy.</span></p>
+9: 
+10: <p style='margin-top:6.0pt;text-autospace:none'><a
+11: name="dieu_13"><b><span lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>Điều
+12: 13. Trình tự công bố hợp quy</span></b></a></p>
+13: 
+14: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+15: style='font-size:10.0pt;font-family:"Arial",sans-serif'>Việc công bố hợp quy
+16: được thực hiện theo các bước sau:</span></p>
+17: 
+18: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+19: style='font-size:10.0pt;font-family:"Arial",sans-serif'>1. Bước 1: Tổ chức, cá
+20: nhân điền thông tin vào bản đăng ký công bố hợp quy theo mẫu tại <a
+21: name="bieumau_pl_04" class='clsBookmark_bm clsopentLogin' onmouseover = "LS_Tip(28,0)" onmouseout="hideddrivetip();">Phụ lục IV</a> kèm Thông tư này.</span></p>
+22: 
+23: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+24: style='font-size:10.0pt;font-family:"Arial",sans-serif'>Tổ chức, cá nhân có
+25: trách nhiệm xác định, liệt kê đầy đủ các quy chuẩn kỹ thuật tương ứng bắt buộc
+26: phải áp dụng cho sản phẩm, hàng hóa, dịch vụ, quá trình, môi trường hoặc các
+27: đối tượng khác trong hoạt động kinh tế - xã hội của mình trong bản đăng ký công
+28: bố hợp quy.</span></p>
+29: 
+30: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+31: style='font-size:10.0pt;font-family:"Arial",sans-serif'>Tổ chức, cá nhân chịu
+32: trách nhiệm về sản phẩm, hàng hóa, dịch vụ, quá trình, môi trường hoặc các đối
+33: tượng khác trong hoạt động kinh tế - xã hội phải ký xác nhận vào bản đăng ký
+34: công bố hợp quy.</span></p>
+35: 
+36: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+37: style='font-size:10.0pt;font-family:"Arial",sans-serif'>2. Bước 2: Tổ chức, cá
+38: nhân thực hiện đăng ký công bố hợp quy qua Cơ sở dữ liệu quốc gia về tiêu
+39: chuẩn, đo lường, chất lượng; nhận mã số xác nhận đã hoàn thành đăng ký công bố
+40: hợp quy trên Cơ sở dữ liệu quốc gia.</span></p>
+41: 
+42: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+43: style='font-size:10.0pt;font-family:"Arial",sans-serif'>Tài liệu kèm theo gồm:</span></p>
+44: 
+45: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+46: style='font-size:10.0pt;font-family:"Arial",sans-serif'>- Bản điện tử của Giấy
+47: chứng nhận phù hợp quy chuẩn kỹ thuật tương ứng do tổ chức chứng nhận hợp quy
+48: cấp cho tổ chức, cá nhân trong trường hợp công bố hợp quy dựa trên kết quả
+49: chứng nhận của tổ chức chứng nhận hợp quy.</span></p>
+50: 
+51: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+52: style='font-size:10.0pt;font-family:"Arial",sans-serif'>- Báo cáo tự đánh giá
+53: hợp quy (theo mẫu tại <a name="bieumau_pl_05" class='clsBookmark_bm clsopentLogin' onmouseover = "LS_Tip(28,0)" onmouseout="hideddrivetip();">Phụ lục V</a> Thông tư này) kèm
+54: theo bản điện tử kết quả thử nghiệm phù hợp với quy chuẩn kỹ thuật của tổ chức
+55: thử nghiệm được chỉ định hoặc công nhận theo quy định tại quy chuẩn kỹ thuật
+56: tương ứng trong trường hợp công bố hợp quy dựa trên kết quả tự đánh giá của tổ
+57: chức, cá nhân.</span></p>
+58: 
+59: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+60: style='font-size:10.0pt;font-family:"Arial",sans-serif'>Trường hợp Cơ sở dữ
+61: liệu quốc gia về tiêu chuẩn, đo lường, chất lượng bị lỗi hoặc chưa hoàn thiện
+62: hạ tầng, tổ chức, cá nhân đăng ký công bố hợp quy theo hình thức nộp trực tiếp
+63: hoặc qua dịch vụ bưu chính tại cơ quan chuyên môn tại địa phương. Cơ quan chuyên
+64: môn tại địa phương có trách nhiệm cập nhật đăng ký công bố hợp quy lên Cơ sở dữ
+65: liệu quốc gia về tiêu chuẩn, đo lường, chất lượng. Trường hợp không có cơ quan
+66: chuyên môn tại địa phương thì cơ quan thuộc Bộ, cơ quan ngang Bộ quản lý ngành,
+67: lĩnh vực được Bộ trưởng, Thủ trưởng cơ quan ngang Bộ chỉ định hoặc giao trách
+68: nhiệm thực hiện tiếp nhận hồ sơ công bố hợp quy của tổ chức, cá nhân.</span></p>
+69: 
+70: <p style='margin-top:6.0pt;text-autospace:none'><a
+71: name="dieu_14"><b><span lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>Điều
+72: 14. Trách nhiệm của tổ chức, cá nhân công bố hợp quy</span></b></a></p>
+73: 
+74: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+75: style='font-size:10.0pt;font-family:"Arial",sans-serif'>1. Thông báo trên các
+76: phương tiện thông tin thích hợp về việc công bố hợp quy của mình đảm bảo người
+77: sử dụng sản phẩm, hàng hóa đó dễ dàng tiếp cận.</span></p>
+78: 
+79: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+80: style='font-size:10.0pt;font-family:"Arial",sans-serif'>2. Duy trì liên tục và
+81: chịu trách nhiệm về sự phù hợp của các sản phẩm, hàng hóa, dịch vụ, quá trình,
+82: môi trường hoặc các đối tượng khác trong hoạt động kinh tế - xã hội đã công bố
+83: hợp quy; duy trì việc kiểm soát chất lượng, thử nghiệm và giám sát định kỳ.</span></p>
+84: 
+85: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+86: style='font-size:10.0pt;font-family:"Arial",sans-serif'>3. Sử dụng dấu hợp quy
+87: đối với sản phẩm, hàng hóa đã được công bố hợp quy theo quy định tại <a
+88: name="tc_5">khoản 2 Điều 4 của Thông tư này</a> trước khi đưa ra lưu thông trên
+89: thị trường. Lập sổ theo dõi và định kỳ hàng năm báo cáo việc sử dụng dấu hợp
+90: quy cho tổ chức chứng nhận.</span></p>
+91: 
+92: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+93: style='font-size:10.0pt;font-family:"Arial",sans-serif'>4. Khi phát hiện sự
+94: không phù hợp của sản phẩm, hàng hóa, dịch vụ, quá trình, môi trường hoặc các
+95: đối tượng khác trong hoạt động kinh tế - xã hội đã công bố hợp quy trong quá
+96: trình lưu thông hoặc sử dụng thì tổ chức, cá nhân công bố hợp quy thực hiện
+97: trách nhiệm, nghĩa vụ theo quy định của <a name="tvpllink_mhyivazsmk_3">Luật
+98: Chất lượng sản phẩm, hàng hoá</a>.</span></p>
+99: 
+100: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+101: style='font-size:10.0pt;font-family:"Arial",sans-serif'>5. Lập và lưu giữ hồ sơ
+102: công bố hợp quy làm cơ sở cho việc kiểm tra, thanh tra của cơ quan quản lý nhà
+103: nước như sau:</span></p>
+104: 
+105: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+106: style='font-size:10.0pt;font-family:"Arial",sans-serif'>a) Trường hợp công bố
+107: hợp quy dựa trên kết quả chứng nhận hợp quy của tổ chức chứng nhận, tổ chức, cá
+108: nhân có trách nhiệm lập và lưu giữ hồ sơ công bố hợp quy bao gồm: bản chính
+109: giấy chứng nhận hợp quy; hồ sơ chứng nhận của tổ chức chứng nhận hợp quy thực
+110: hiện; bản đăng ký công bố hợp quy và thông tin xác nhận đã đăng ký công bố hợp
+111: quy trên Cơ sở dữ liệu quốc gia về tiêu chuẩn, đo lường, chất lượng.</span></p>
+112: 
+113: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+114: style='font-size:10.0pt;font-family:"Arial",sans-serif'>b) Trường hợp công bố
+115: hợp quy dựa trên kết quả tự đánh giá của tổ chức, cá nhân sản xuất, kinh doanh,
+116: tổ chức, cá nhân có trách nhiệm lập và lưu giữ hồ sơ công bố hợp quy bao gồm:
+117: bản chính hồ sơ tự đánh giá giám sát của tổ chức, cá nhân; bản đăng ký công bố
+118: hợp quy và thông tin xác nhận đã đăng ký công bố hợp quy trên Cơ sở dữ liệu
+119: quốc gia về tiêu chuẩn, đo lường, chất lượng.</span></p>
+120: 
+121: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+122: style='font-size:10.0pt;font-family:"Arial",sans-serif'>c) Hồ sơ tự đánh giá
+123: của tổ chức, cá nhân có các nội dung sau:</span></p>
+124: 
+125: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+126: style='font-size:10.0pt;font-family:"Arial",sans-serif'>- Mô tả chung về sản
+127: phẩm, hàng hóa, dịch vụ, quá trình, môi trường hoặc các đối tượng khác trong
+128: hoạt động kinh tế - xã hội (chức năng, công dụng, cấu tạo, thông số kỹ thuật cơ
+129: bản; tài liệu thiết kế, sơ đồ, ảnh chụp, nhãn, bao gói…); quy trình, quá trình
+130: sản xuất, bao gồm thông tin về nguyên liệu, công nghệ, hệ thống quản lý chất
+131: lượng (nếu áp dụng).</span></p>
+132: 
+133: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+134: style='font-size:10.0pt;font-family:"Arial",sans-serif'>- Báo cáo nội dung về
+135: phương pháp, kết quả thử nghiệm; so sánh với yêu cầu của quy chuẩn kỹ thuật
+136: tương ứng, kèm theo bản sao kết quả thử nghiệm của tổ chức thử nghiệm được công
+137: nhận hoặc chỉ định, thừa nhận theo quy định của pháp luật.</span></p>
+138: 
+139: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+140: style='font-size:10.0pt;font-family:"Arial",sans-serif'>- Kế hoạch kiểm soát
+141: chất lượng phù hợp quy chuẩn kỹ thuật, giám sát định kỳ: tần suất, phương pháp
+142: kiểm tra, thử nghiệm, biện pháp duy trì phù hợp với quy chuẩn kỹ thuật tương
+143: ứng.</span></p>
+144: 
+145: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+146: style='font-size:10.0pt;font-family:"Arial",sans-serif'>- Các tài liệu liên
+147: quan khác (nếu có yêu cầu trong quy chuẩn kỹ thuật tương ứng).</span></p>
+148: 
+149: <p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+150: style='font-size:10.0pt;font-family:"Arial",sans-serif'>- Báo cáo tự đánh giá
+151: của tổ chức, cá nhân được ký xác nhận.</span></p>

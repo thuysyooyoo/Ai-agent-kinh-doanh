@@ -67,15 +67,18 @@ Bắt buộc thu thập đủ các tham số:
 4.  **Thông số lô hàng**: Trọng lượng thực tế (kg), Thể tích thực tế (m³), Số lượng mục hàng, Trị giá hàng chưa VAT, Số tiền thanh toán hộ (nếu có), Mã số HS của mặt hàng (nếu có).
 *(Hỏi lại Sales nếu thiếu)*
 
-#### 🔍 BẮT BUỘC TRA CỨU CHÍNH SÁCH HÀNG HÓA RỦI RO:
-* Ngay khi nhận được thông tin mã số HS (hoặc tên sản phẩm), bạn bắt buộc phải thực hiện tra cứu chính sách hàng hóa nhập khẩu bằng cách chạy công cụ:
-  `python scripts/check_hs_policy.py --hs <Mã số HS>`
+#### 🔍 BẮT BUỘC TRA CỨU CHÍNH SÁCH HÀNG HÓA RỦI RO (ĐỌC TRỰC TIẾP EXCEL):
+* Ngay khi nhận được thông tin mã số HS (hoặc tên sản phẩm), bạn bắt buộc phải thực hiện tra cứu chính sách hàng hóa nhập khẩu rủi ro bằng cách đọc trực tiếp từ tệp tin Excel nguồn gốc `d:\ERK\VBPL\DANH MỤC HÀNG HÓA RỦI RO\DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx`. Bạn thực hiện việc này bằng cách chạy công cụ Python:
+  `python "d:\AI AGENT THUY\AI agent Kinh doanh\scripts\check_excel_hs_policy.py" --hs <Mã số HS>`
 * Nếu kết quả trả về cho thấy mặt hàng thuộc diện **Rủi ro cao** hoặc **Rủi ro trung bình**, bạn bắt buộc phải:
   1. Cảnh báo rõ cho Sales biết về mức độ rủi ro (Cao hay Trung bình).
   2. Nêu rõ Bộ ban ngành quản lý, quy chuẩn kỹ thuật (QCVN) áp dụng.
   3. Đưa thời gian thông quan ước tính tương ứng (7-14 ngày đối với hàng rủi ro cao do phải chờ thử nghiệm và thông báo ĐẠT chất lượng chuyên ngành; 1-3 ngày đối với hàng rủi ro trung bình do được thông quan và bán ngay) vào báo giá.
   4. Nhắc Sales hỏi khách hàng về mã số mã vạch GS1 hoặc tư vấn đăng ký mã vạch GS1 để được hưởng Whitelist thông quan tự động.
   5. Cộng thêm các chi phí làm kiểm tra chất lượng (nếu có) vào mục "Chi phí khác" trong bảng tính.
+  6. **Lưu ý đặc biệt về hai thông tư mới hiệu lực từ 01/07/2026:**
+     - Các mặt hàng thuộc quản lý của **Bộ Công Thương** thực hiện theo **Thông tư 33/2026/TT-BCT** (thay thế Thông tư 41/2023/TT-BCT).
+     - Các mặt hàng phương tiện đường sắt và linh kiện xe điện thuộc quản lý của **Bộ Xây dựng** (lĩnh vực GTVT) thực hiện theo **Thông tư 49/2026/TT-BXD** (bãi bỏ các Thông tư 12/2022/TT-BGTVT và 62/2024/TT-BGTVT của Bộ GTVT). Nhóm này hiện do **Bộ Xây dựng** quản lý chứ không còn thuộc Bộ Giao thông Vận tải.
 
 ### Bước 2: Tính toán & Ước tính chi phí (Dựa trên cấu trúc Bảng Giá Nhanh)
 1. **Giá cước vận chuyển (Tổng Phí VC)**: `MIN(Cước VIP, Cước Linh Hoạt)`. Khối lượng áp dụng = `MAX(Số khối, Số cân / 250)`.

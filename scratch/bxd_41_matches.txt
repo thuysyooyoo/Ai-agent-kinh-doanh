@@ -1,0 +1,23 @@
+Match at 31070: giao thông nhựa nhiệt dẻo
+4.2.9 Sơn vạch đường giao thông hệ dung môi, hệ nước
+4.2.10 Sợi gia cường (aramid, carbon, xenlulo, polyvinyl alcohol, polyetylen, 
+polypropylen và các loại khác)
+4.2.11 Keo 
+Match at 31117: giao thông hệ dung môi, hệ nước
+4.2.10 Sợi gia cường (aramid, carbon, xenlulo, polyvinyl alcohol, polyetylen, 
+polypropylen và các loại khác)
+4.2.11 Keo dán (polyvinyl acetat và các chủng loại khác)
+4
+Match at 35970: 49.00; 
+4412.51.00; 4412.52.00; 
+4412.59.00; 4412.91.10 
+4412.91.90; 4412.92.00; 
+4412.99.00;
+4418.75.00; 4418.79.00;
+4418.81.10; 4418.81.90; 
+4418.82.00; 4418.89.00; 
+4418.99.00
+PT2, PT 5, PT 7
+22
+5
+

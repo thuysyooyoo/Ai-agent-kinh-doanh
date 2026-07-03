@@ -1,0 +1,20 @@
+Sheet Rủi ro cao:
+Bộ Xây dựng: 19
+Bộ Công Thương: 169
+Bộ Giao thông Vận tải: 99
+Bộ Y tế: 8
+Bộ Công an: 5
+Bộ Nông nghiệp và Phát triển nông thôn: 24
+Bộ Thông tin và Truyền thông: 112
+Bộ Khoa học và Công nghệ: 155
+
+Sheet Rủi ro trung bình:
+Bộ Xây dựng: 77
+Bộ Công Thương: 934
+Bộ Giao thông Vận tải: 19
+Bộ Y tế: 1
+Bộ Công an: 35
+Bộ Nông nghiệp và Phát triển nông thôn: 582
+Bộ Thông tin và Truyền thông: 169
+Bộ Khoa học và Công nghệ: 254
+

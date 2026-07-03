@@ -1,0 +1,12 @@
+[
+  {
+    "STT": "1",
+    "Tên sản phẩm, hàng hóa": "Pháo hoa các loại",
+    "Quy chuẩn kỹ thuật/Tiêu chuẩn": "QCVN 04/BCA",
+    "Mã số HS gốc": "3604.10.00",
+    "Mô tả sản phẩm, hàng hóa": "",
+    "Yêu cầu quản lý chất lượng tương ứng": "a. Trong nhập khẩu: Hàng hoá nhập khẩu thực hiện kiểm tra nhà nước về chất lượng theo",
+    "Bộ ban ngành quản lý": "Bộ Công an",
+    "Mức độ rủi ro": "Cao"
+  }
+]

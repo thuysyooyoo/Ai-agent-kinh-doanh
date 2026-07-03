@@ -1,0 +1,480 @@
+font-size:10.0pt;font-family:
+  "Arial",sans-serif'><br>
+  <b>Đại diện Tổ chức, cá nhân</b><br>
+  (Ký tên, chức vụ, đóng dấu)</span></p>
+  </td>
+ </tr>
+</table>
+
+<p style='margin-top:6.0pt;text-autospace:none'><i><span
+lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>&nbsp;</span></i></p>
+
+<p align=center style='margin-top:6.0pt;text-align:center;
+text-autospace:none'><a name="chuong_pl_4"><b><span lang=VI style='font-family:
+"Arial",sans-serif'>PHỤ LỤC IV</span></b></a></p>
+
+<p align=center style='margin-top:6.0pt;text-align:center;
+text-autospace:none'><a name="chuong_pl_4_name"><span lang=VI style='font-size:
+10.0pt;font-family:"Arial",sans-serif'>BIỂU MẪU ĐĂNG KÝ CÔNG BỐ HỢP QUY</span></a><span
+lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'><br>
+<i>(Ban hành kèm theo Thông tư số 14/2026/TT-BKHCN</i> <i>ngày </i></span><i><span
+lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>09 </span></i><i><span
+lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>tháng </span></i><i><span
+lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>4</span></i><span
+lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'> <i>năm 2026
+của Bộ trưởng Bộ Khoa học và Công nghệ)</i></span></p>
+
+<p align=center style='margin-top:6.0pt;text-align:center;
+text-autospace:none'><b><span lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>CỘNG
+HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM<br>
+Độc lập - Tự do - Hạnh phúc<br>
+---------------</span></b></p>
+
+<p align=center style='margin-top:6.0pt;text-align:center;
+text-autospace:none'><b><span lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>BẢN
+ĐĂNG KÝ CÔNG BỐ HỢP QUY</span></b></p>
+
+<p align=center style='margin-top:6.0pt;text-align:center;
+text-autospace:none'><span lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>Số…………………</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>Tên tổ chức, cá
+nhân:...................................................................................................
+</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>Địa chỉ:
+........................................................................................................................
+</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>Điện
+thoại:………………………………Fax:
+............................................................ </span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>E-mail:
+.........................................................................................................................</span></p>
+
+<p align=center style='margin-top:6.0pt;text-align:center;
+text-autospace:none'><b><span lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>CÔNG
+BỐ:</span></b></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>Sản phẩm, hàng hóa, quá
+trình, dịch vụ, môi trường hoặc các đối tượng khác trong hoạt động kinh tế - xã
+hội <i>(tên gọi, kiểu, loại, nhãn hiệu, đặc trưng kỹ thuật,….)</i></span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>.....................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>.....................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>Phù hợp với quy chuẩn
+kỹ thuật <i>(số hiệu, ký hiệu, tên gọi)</i></span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>.....................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>.....................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>Thông tin bổ sung <i>(căn
+cứ công bố hợp quy, phương thức đánh giá sự phù hợp….)</i></span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>.....................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>.....................................................................................................................................
+</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>Loại hình đánh giá:</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>+ Tổ chức chứng nhận
+đánh giá: Tên tổ chức chứng nhận, số giấy chứng nhận, ngày cấp giấy chứng nhận;</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>.....................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>.....................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>+ Tự đánh giá: Ngày
+lãnh đạo tổ chức, cá nhân ký xác nhận Báo cáo tự đánh giá.</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>........................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>........................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>....(Tên tổ chức, cá
+nhân).... cam kết và chịu trách nhiệm về tính phù hợp của ……. (sản phẩm, hàng
+hóa, quá trình, dịch vụ, môi trường và các đối tượng khác trong hoạt động kinh
+tế - xã hội) do mình sản xuất, kinh doanh, bảo quản, vận chuyển, sử dụng, khai
+thác.</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><i><span
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>&nbsp;</span></i></p>
+
+<table border=0 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse'><!--VABWAFAATABfADIAMAAyADYAMAA1ADEANQA=-->
+ <tr>
+  <td width=295 valign=top style='width:221.4pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p style='margin-top:6.0pt'><span lang=VI style='font-size:
+  10.0pt;font-family:"Arial",sans-serif'>&nbsp;</span></p>
+  </td>
+  <td width=295 valign=top style='width:221.4pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p align=center style='margin-top:6.0pt;text-align:center'><i><span
+  lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>……….. , ngày
+  ……tháng ……năm ……</span></i><span lang=VI style='font-size:10.0pt;font-family:
+  "Arial",sans-serif'><br>
+  <b>Đại diện Tổ chức, cá nhân</b><br>
+  (Ký tên, chức vụ, đóng dấu)</span></p>
+  </td>
+ </tr>
+</table>
+
+<p style='margin-top:6.0pt;text-autospace:none'><i><span
+lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>&nbsp;</span></i></p>
+
+<p align=center style='margin-top:6.0pt;text-align:center;
+text-autospace:none'><a name="chuong_pl_5"><b><span lang=VI style='font-family:
+"Arial",sans-serif'>PHỤ LỤC V</span></b></a></p>
+
+<p align=center style='margin-top:6.0pt;text-align:center;
+text-autospace:none'><a name="chuong_pl_5_name"><span lang=VI style='font-size:
+10.0pt;font-family:"Arial",sans-serif'>BÁO CÁO TỰ ĐÁNH GIÁ HỢP CHUẨN/HỢP QUY</span></a><span
+lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'><br>
+<i> (Ban hành kèm theo Thông tư số</i> <i>14/2026/TT-BKHCN</i> <i>ngày</i></span><i><span
+lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>09 </span></i><i><span
+lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>tháng</span></i><i><span
+lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>4</span></i><span
+lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'> <i>năm 2026
+của Bộ trưởng Bộ Khoa học và Công nghệ)</i></span></p>
+
+<table border=0 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse'><!--VABWAFAATABfADIAMAAyADYAMAA1ADEANQA=-->
+ <tr>
+  <td width=223 valign=top style='width:167.4pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p align=center style='margin-top:6.0pt;text-align:center'><span
+  lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>TÊN CƠ QUAN
+  CHỦ QUẢN </span><span style='font-size:10.0pt;font-family:"Arial",sans-serif'><br>
+  </span><i><span lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>(nếu
+  có)</span></i><span lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'><br>
+  <b>TÊN TỔ CHỨC, CÁ NHÂN</b><b><br>
+  -------</b></span></p>
+  </td>
+  <td width=367 valign=top style='width:275.4pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p align=center style='margin-top:6.0pt;text-align:center'><b><span
+  lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>CỘNG HÒA XÃ
+  HỘI CHỦ NGHĨA VIỆT NAM<br>
+  Độc lập - Tự do - Hạnh phúc<br>
+  ---------------</span></b></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=223 valign=top style='width:167.4pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p align=center style='margin-top:6.0pt;text-align:center'><span
+  lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>Số:
+  ……..........</span></p>
+  </td>
+  <td width=367 valign=top style='width:275.4pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p align=right style='margin-top:6.0pt;text-align:right'><i><span
+  lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>………, ngày …
+  tháng …. năm …..</span></i></p>
+  </td>
+ </tr>
+</table>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>&nbsp;</span></p>
+
+<p align=center style='margin-top:6.0pt;text-align:center;
+text-autospace:none'><b><span lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>BÁO
+CÁO TỰ ĐÁNH GIÁ HỢP CHUẨN/HỢP QUY</span></b></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>1. Tên tổ chức, cá
+nhân; địa chỉ; điện thoại, fax:
+............................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>2. Tên sản phẩm, hàng
+hoá:..............................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>3. Địa điểm, ngày đánh
+giá:..............................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>4. Số hiệu tiêu chuẩn /quy
+chuẩn kỹ thuật áp
+dụng:.........................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>5. Tên tổ chức thử
+nghiệm sản phẩm, hàng
+hoá:.............................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>6. Đánh giá về kết quả
+thử nghiệm theo tiêu chuẩn /quy chuẩn kỹ thuật áp dụng:</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>...........................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>...........................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>...........................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>...........................................................................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>7. Các nội dung khác
+(nếu có):.........................................................................................</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>8. Kết luận:</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>• Sản phẩm, hàng hoá
+phù hợp tiêu chuẩn/quy chuẩn kỹ thuật.</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>• Sản phẩm, hàng hoá
+không phù hợp tiêu chuẩn/quy chuẩn kỹ thuật.</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span lang=VI
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>Cam kết chất lượng sản
+phẩm, hàng hóa phù hợp với quy chuẩn kỹ thuật, tiêu chuẩn công bố áp dụng và
+hoàn toàn chịu trách nhiệm trước pháp luật về chất lượng sản phẩm, hàng hóa và
+kết quả tự đánh giá.</span></p>
+
+<p style='margin-top:6.0pt;text-autospace:none'><b><span
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>&nbsp;</span></b></p>
+
+<table border=0 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse'><!--VABWAFAATABfADIAMAAyADYAMAA1ADEANQA=-->
+ <tr>
+  <td width=255 valign=top style='width:191.4pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p align=center style='margin-top:6.0pt;text-align:center'><b><span
+  lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>Người đánh
+  giá</span></b><span style='font-size:10.0pt;font-family:"Arial",sans-serif'><br>
+  </span><i><span lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>(ký
+  và ghi rõ họ tên)</span></i></p>
+  </td>
+  <td width=335 valign=top style='width:251.4pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p align=center style='margin-top:6.0pt;text-align:center'><b><span
+  lang=VI style='font-size:10.0pt;font-family:"Arial",sans-serif'>Xác nhận của
+  lãnh đạo tổ chức, cá nhân</span></b><span lang=VI style='font-size:10.0pt;
+  font-family:"Arial",sans-serif'><br>
+  <i>(ký tên, chức vụ, đóng dấu)</i></span></p>
+  </td>
+ </tr>
+</table>
+
+<p style='margin-top:6.0pt;text-autospace:none'><span
+style='font-size:10.0pt;font-family:"Arial",sans-serif'>&nbsp;</span></p>
+
+</div>
+
+<!--LdABoAHUAdgBpAGUAbgBwAGgAYQBwAGwAdQBhAHQALgB2AG4A--></div>
+
+    
+</div>
+                                   
+                                </div>
+                                <div style="width: 190px; float: right; margin-top: 10px;" class="NoiDungChiaSe">
+                                    <div class="download1">
+                                    </div>
+                                    
+<div class="box_bm_m">
+
+    <ul class="clearfix">
+        <li id="hd-save-doc">
+            <a onclick="return DeleteDoc(this);" id="ctl00_Content_ThongTinVB_ChiaSe_lbtSave" title="Bạn phải đăng nhập mới sử dụng được chức năng này" class="aspNetDisabled save AddOrDeleteMyDoc">Lưu trữ</a></li>
+        <li><a onclick="return LawNote()" class="LawNote"><b style="color: Red">Ghi chú</b> </a></li>
+        <li><a href="#" class="ykien SendFeedBack_vb">Ý kiến</a></li><li><a href="http://www.facebook.com/sharer.php?u=https://thuvienphapluat.vn/van-ban/Linh-vuc-khac/Thong-tu-14-2026-TT-BKHCN-cong-bo-hop-chuan-cong-bo-hop-quy-701557.aspx" id="ctl00_Content_ThongTinVB_ChiaSe_sFaceBook" class="Facebook" target="_blank">Facebook </a></li>
+        <li><a href="#" class="email lkSendEmail">Email</a></li>
+        <li><a href="#" class="print lkPrintDoc" title="Bản để In">In</a></li>
+    </ul>
+    <div class="ssvb" style="display: block">
+        <a onclick="AddCustomerAction('', 1234,'');">
+            <input id="btTheoDoiHieuLuc" onmouseover='LS_Tip(300,0)' onmouseout='hideddrivetip();' type="button"
+                value=" Theo dõi hiệu lực VB " class="button-search" onclick="NotifiLawStatus()"
+                style="width: 100%;" /></a>
+    </div>
+    <div class="clr">
+    </div>
+    <div class="ssvb divShowComparison">
+        <a class="clsShowComparison" onclick="return clsShowComparison()" onmouseover='LS_Tip(28,0)'
+            onmouseout='hideddrivetip();'>
+            <input type="button" value=" Văn bản thay thế " class="button-search" style="width: 100%;" /></a>
+        <div class="clr">
+        </div>
+    </div>
+    <div class="ssvb divGetTVPL_EffectDetail">
+        <a  onclick="return clsGetTVPL_EffectDetail()" onmouseover='LS_Tip(28,0)' onmouseout='hideddrivetip();'>
+            <input id="btnSoSanhThayThe" type="button" value=" So sánh VB thay thế " class="button-search" style="width: 100%;" /></a>
+        <div class="clr">
+        </div>
+    </div>
+    <div class="ssvb divSongngu">
+        <a class="clssongngu" onclick="return clssongngu()" onmouseover='LS_Tip(30,0)' onmouseout='hideddrivetip();'>
+            <input id="btnSongNgu" type="button" value=" Văn bản song ngữ " class="button-search" style="width: 100%;" />
+        </a>
+        <div class="clr">
+        </div>
+    </div>
+
+     
+
+      <div class="clr" style="margin-top:10px">
+        </div>
+       <div id="TVNDWidget" utm='vanban'></div>
+    <div class="clr">
+        </div>
+    <div class="ttlq">
+        <ul><li>Bài liên quan:</li><li><a  target="_blank" href="https://thuvienphapluat.vn/chinh-sach-phap-luat-moi/vn/thong-bao-van-ban-moi/email/110379/trinh-tu-cong-bo-hop-chuan?rel=tin_tuc_chitietvb" onclick="BVLQ_VB('Trình tự công bố hợp chuẩn')"><img src='https://imgnews.thuvienphapluat.vn/getavata.aspx?id=137'/> Trình tự công bố hợp chuẩn</a></li></ul>
+        <div class="clr"></div>
+        
+    </div>
+
+
+  
+
+    <div class="clr px10"></div>
+
+    
+    <div class="ulnhch ulnhch01" style="display: none;">
+        <ul style="width: 100%; margin-top: 10px; display: block;">
+            <li style="font-size: 16px; font-weight: bold; color: #f7721b; border-bottom: 1px solid #f7721b;width: 100%;">
+                <a class="ahd1" style="width: 100%; float: left; text-align: left; padding-top: 0px;
+                    font: normal 16px Arial,sans-serif; font-weight: bold;" target="_blank" href="https://thuvienphapluat.vn/hoi-dap-phap-luat">
+                    Hỏi đáp pháp luật</a></li>
+        </ul>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.get("https://thuvienphapluat.vn/hoi-dap-phap-luat/get-top-news-by-laws?topNum=5&listIdLaw=701557", function (data) {
+
+                var json = data;
+                if (json.length > 0) {
+
+
+                    var title = $("#tab8 > div > div span").text().trim();
+                    var newTitle = title.replace(/[?&]/g, "-");
+
+                    $(".ulnhch01").show();
+                    for (var i = 0; i < json.length && i < 10; i++) {
+                        $(".ulnhch01").append("<li style=' list-style-type: none;'><a style='width: 100%; color:#066cd2;   text-align: left;    padding-top: 10px;    font-size: 14px;    font-family: Arial;' target='_blank' href='" + json[i].FriendlyUrl + "?rel=hoidap_chitietvb' title='" + json[i].Title + "'>" + json[i].Title + "</a></li>");
+                    }
+
+                    
+                }
+                else {
+                    $(".ulnhch01").hide();
+                }
+
+            }).success(function () {
+            });
+        });
+    </script>
+    <div class="clr px10"></div>
+
+    <div class="ulnhch ulnhch05" style="display: none;">
+        <ul style="width: 100%; margin-top: 10px; display: block;">
+            <li style="font-size: 16px; font-weight: bold; color: #f7721b; border-bottom: 1px solid #f7721b;width: 100%;">
+                <a class="ahd1" style="width: 100%; float: left; text-align: left; padding-top: 0px;
+                    font: normal 16px Arial,sans-serif; font-weight: bold;" target="_blank" href="https://thuvienphapluat.vn/ma-so-thue/bai-viet">
+                    Pháp Luật Thuế</a></li>
+        </ul>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.get("https://thuvienphapluat.vn/ma-so-thue/get-top-news-by-laws?topNum=5&listIdLaw=701557", function (data) {
+
+                var json = data;
+                if (json.length > 0) {
+
+
+                    var title = $("#tab8 > div > div span").text().trim();
+                    var newTitle = title.replace(/[?&]/g, "-");
+
+                    $(".ulnhch05").show();
+                    for (var i = 0; i < json.length && i < 10; i++) {
+                        $(".ulnhch05").append("<li style=' list-style-type: none;'><a style='width: 100%; color:#066cd2;   text-align: left;    padding-top: 10px;    font-size: 14px;    font-family: Arial;' target='_blank' href='" + json[i].FriendlyUrl + "?rel=hoidap_chitietvb' title='" + json[i].Title + "'>" + json[i].Title + "</a></li>");
+                    }
+
+                   
+                }
+                else {
+                    $(".ulnhch05").hide();
+                }
+
+            }).success(function () {
+            });
+        });
+    </script>
+    <div class="clr px10"></div>
+
+
+     <div class="ulnhch" >
+        <ul class="ulnhch02" style="width: 100%; margin-top: 10px; display: none;">
+            <li style="font-size: 16px; font-weight: bold; color: #f7721b; border-bottom: 1px solid #f7721b;width: 100%;">
+                <a class="ahd2" style="width: 100%; float: left; text-align: left; padding-top: 0px;
+                    font: normal 16px Arial,sans-serif; font-weight: bold;" target="_blank" href="https://thuvienphapluat.vn/banan">
+                    Bản án liên quan</a></li>
+        </ul>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.get("https://thuvienphapluat.vn/banan/api/ban-an-theo-van-ban-701557", function (data) {
+                var json = data;
+                if (json.Data != null && json.Data != undefined && json.Data.length > 0) {
+                    $(".ahd2").attr("href", json.link);
+                    $(".ulnhch02").show();
+
+                    var title = $("#tab8 > div > div span").text().trim(); ;
+                    var newTitle = title.replace(/[?&]/g, "-");
+
+                    for (var i = 0; i < json.Data.length && i < 5; i++) {
+                        $(".ulnhch02").append("<li style='list-style-type: none;'><a style='width: 100%; color:#066cd2; text-align: left;  padding-top: 10px;  font-size: 14px;' target='_blank' href='" + json.Data[i].Url + "?rel=ban_an_chitietvb' title='" + json.Data[i].TieuDe + "'>" + json.Data[i].TieuDe + "</a></li>");
+                    }
+
+                    
+
+                }
+                else {
+                    $(".ulnhch02").hide();
+                }
+
+            }).success(function () {
+            });
+        });
+    </script>
+
+
+
+     <div class="blPLDN" style="display:none">
+      <div class="clr px10">
+    </div>
+    <div class="ttlq">
+    <ul>
+    <li style="font-size: 14px;"><a style="font-weight: 700; color: red; " href="https://thuvienphapluat.vn/phap-luat-doanh-nghiep/">PHÁP LUẬT DOANH NGHIỆP</a></li>
+    </ul>
+    </div>
+     </div>
+    <script

@@ -1,0 +1,3 @@
+Sheets: ['Rủi ro cao', 'Rủi ro trung bình']
+Sheet Rủi ro cao: columns=['STT', 'Tên sản phẩm, hàng hóa', 'Quy chuẩn kỹ thuật/Tiêu chuẩn', 'Mã số HS', 'Mô tả sản phẩm, hàng hóa', 'Yêu cầu quản lý chất lượng tương ứng', 'Bộ ban ngành quản lý']
+Sheet Rủi ro trung bình: columns=['STT', 'Tên sản phẩm, hàng hóa', 'Quy chuẩn kỹ thuật/Tiêu chuẩn', 'Mã số HS', 'Mô tả sản phẩm, hàng hóa', 'Yêu cầu quản lý chất lượng tương ứng', 'Bộ ban ngành quản lý']

@@ -1,5 +1,5 @@
 # DANH MỤC HÀNG HÓA RỦI RO VÀ QUY TRÌNH NHẬP KHẨU
-*Tài liệu tri thức nghiệp vụ nội bộ Eureka Logistics - Cập nhật theo Nghị định 37/2026/NĐ-CP & Thông tư 31/2026/TT-BCT*
+*Tài liệu tri thức nghiệp vụ nội bộ Eureka Logistics - Cập nhật theo Nghị định 37/2026/NĐ-CP & Thông tư 33/2026/TT-BCT*
 
 ---
 
@@ -15,7 +15,7 @@
 Chính sách kiểm tra chất lượng và quản lý hàng hóa nhập khẩu tại Việt Nam đã chuyển đổi toàn diện từ cơ chế quản lý thủ công ("xin-cho") sang cơ chế **SỐ HÓA - LIÊN THÔNG - TỰ ĐỘNG** thông qua các văn bản pháp quy cốt lõi:
 1.  **Luật Chất lượng Sản phẩm, Hàng hóa sửa đổi 2025 (Luật số 78/2025/QH15):** Đặt nền tảng cho việc phân loại rủi ro thông minh, bắt buộc truy xuất nguồn gốc (TXNG) và tự động hóa cơ chế giảm kiểm tra thông quan.
 2.  **Nghị định số 37/2026/NĐ-CP (Hiệu lực từ 01/07/2026):** Quy định chi tiết danh mục hàng hóa rủi ro, quy trình kiểm tra nhà nước, phương thức đánh giá hợp quy, điều kiện giảm kiểm tra và cơ chế liên thông tự động.
-3.  **Thông tư 31/2026/TT-BCT (Bộ Công Thương) - ĐÃ BAN HÀNH:** Là Thông tư đầu tiên cụ thể hóa Luật sửa đổi 2025, đóng vai trò "khung chuẩn" để các bộ khác xây dựng văn bản riêng. Lộ trình gồm 2 giai đoạn:
+3.  **Thông tư 33/2026/TT-BCT (Bộ Công Thương) - ĐÃ BAN HÀNH:** Là Thông tư đầu tiên cụ thể hóa Luật sửa đổi 2025, đóng vai trò "khung chuẩn" để các bộ khác xây dựng văn bản riêng. Lộ trình gồm 2 giai đoạn:
     *   *Giai đoạn 1 (Hiện tại → hết 31/12/2026):* Định danh sản phẩm (Khai GTIN và đăng ký mã số mã vạch GS1).
     *   *Giai đoạn 2 (Từ 01/01/2027):* Bắt buộc hoàn thiện Truy xuất nguồn gốc (TXNG) trước khi lưu thông trên thị trường.
 
@@ -27,8 +27,8 @@ Hệ thống quản lý chất lượng đặc thù áp dụng đối với **36
 | Bộ quản lý ngành | Số SP Rủi ro cao | Số SP Rủi ro trung bình | Quy chuẩn kỹ thuật tiêu biểu / Văn bản áp dụng | Nhóm sản phẩm tiêu biểu & Ghi chú |
 | :--- | :---: | :---: | :--- | :--- |
 | **Bộ Khoa học và Công nghệ (BKHCN)** | 44 | 91 | QCVN 04:2009/BKHCN (An toàn điện)<br>QCVN 09:2015/BKHCN (EMC)<br>QCVN 03:2019/BKHCN (Đồ chơi trẻ em) | Thiết bị điện gia dụng, thiết bị CNTT, đồ chơi trẻ em, thiết bị âm thanh/hình ảnh. (Bộ có số lượng SP nhiều nhất). |
-| **Bộ Công Thương (BCT)** | 16 | 20 | QCVN 03-05:2012/BCT (VLN CN)<br>QCVN 6-2:2010/BYT (Đồ uống)<br>QCVN 28:2026/BCT (Sữa)<br>QCVN 29:2026/BCT (Dầu TV) | Vật liệu nổ công nghiệp, sữa, dầu thực vật, thép làm cốt bê tông, dệt may, da giày. (Đã ban hành TT 31/2026). |
-| **Bộ Xây dựng - GTVT (BXD-GTVT)** | 36 | 8 | QCVN 2024/BGTVT các loại | Ô tô, xe máy, xe chuyên dùng, gương ô tô/xe máy, lốp hơi, vành bánh xe, khung xe, bình chịu áp lực giao thông. |
+| **Bộ Công Thương (BCT)** | 16 | 20 | QCVN 03-05:2012/BCT (VLN CN)<br>QCVN 6-2:2010/BYT (Đồ uống)<br>QCVN 28:2026/BCT (Sữa)<br>QCVN 29:2026/BCT (Dầu TV) | Vật liệu nổ công nghiệp, sữa, dầu thực vật, thép làm cốt bê tông, dệt may, da giày. (Đã ban hành TT 33/2026). |
+| **Bộ Xây dựng - GTVT (BXD-GTVT) & BGTVT** | 36 | 8 | QCVN 2024/BGTVT các loại & QCVN/BXD | - BXD-GTVT: Toa xe, đầu máy đường sắt, xe mô tô/gắn máy điện và phụ tùng (ắc quy, động cơ xe điện) theo TT 49/2026/TT-BXD.<br>- BGTVT: Ô tô, xe máy xăng, xe chuyên dùng (cần cẩu, xe nâng...), lốp hơi, vành bánh xe... |
 | **Bộ Xây dựng - VLXD (BXD-VLXD)** | 15 | 16 | QCVN 16:2023/BXD và các quy chuẩn VLXD | Xi măng, kính xây dựng, thạch cao, tro bay, bê tông thương phẩm, gạch, vật liệu ốp lát. |
 | **Bộ Nông nghiệp & Môi trường (BNNMT)** | 5 | 64 | Các QCVN về thuốc BVTV, phân bón, TĂCN | Thuốc bảo vệ thực vật, phân bón, thức ăn chăn nuôi, giống cây trồng, vật nuôi, thủy sản. (Nhiều hàng rủi ro trung bình nhất). |
 | **Bộ Y tế (BYT)** | 9 | 1 | QCVN về dược liệu, TPCN, mỹ phẩm | Dược liệu làm thuốc, thực phẩm chức năng, thực phẩm bảo vệ sức khỏe, mỹ phẩm đặc trị. |
@@ -37,101 +37,13 @@ Hệ thống quản lý chất lượng đặc thù áp dụng đối với **36
 
 ---
 
-## 3. CHI TIẾT DANH MỤC HÀNG HÓA VÀ LƯU Ý THEO BỘ
+## 3. THAM CHIẾU DANH MỤC HÀNG HÓA RỦI RO CHI TIẾT
 
-### 3.1 Bộ Khoa học và Công nghệ (135 sản phẩm)
-*   **Danh mục Rủi ro cao:**
-    *   Thiết bị điện gia dụng: Máy sấy tóc, bếp điện, lò vi sóng, quạt điện, bình nước nóng, máy hút bụi...
-    *   Thiết bị công nghệ thông tin: Máy tính, laptop, màn hình máy tính, máy in, máy scan...
-    *   Đồ chơi trẻ em các loại.
-    *   Thiết bị âm thanh, video, camera giám sát.
-*   **Danh mục Rủi ro trung bình:**
-    *   Linh kiện điện tử, thiết bị viễn thông, thiết bị mạng.
-    *   Thiết bị điện công nghiệp, dây cáp điện.
-    *   Pin, ắc quy, thiết bị lưu điện (UPS).
-    *   Sản phẩm nhựa, cao su kỹ thuật.
-*   **Lưu ý cho Sale:** Thiết bị điện là mặt hàng nhập khẩu phổ biến nhất tại Eureka. Sale cần tra cứu kỹ mã số HS và model của khách để áp đúng quy chuẩn.
+Chi tiết danh mục hàng hóa rủi ro (bao gồm mã HS, tên sản phẩm, quy chuẩn kỹ thuật quốc gia QCVN áp dụng, mức độ rủi ro trung bình/cao và yêu cầu quản lý chất lượng cụ thể) sẽ luôn được tham chiếu trực tiếp từ:
+1.  **File Excel tổng hợp gốc**: [DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx](file:///D:/ERK/VBPL/DANH%20M%E1%BB%A4C%20H%C3%80NG%20H%C3%93A%20R%E1%BB%A6I%20RO/DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx)
+2.  **Công cụ tra cứu nhanh**: Chạy lệnh python scripts/check_hs_policy.py --hs <Mã HS> trong hệ thống để tra cứu thời gian thực.
 
-### 3.2 Bộ Công Thương (36 sản phẩm)
-*   **Danh mục Rủi ro cao:**
-    *   Vật liệu nổ công nghiệp: Amoni nitrat, natri nitrat, kali clorat, kali perclorat...
-    *   Đồ uống (có cồn và không cồn).
-    *   Sữa dạng lỏng, sữa bột, sữa lên men, phomat.
-    *   Dầu thực vật.
-    *   Thép làm cốt bê tông, thép mạ các loại.
-*   **Danh mục Rủi ro trung bình:**
-    *   Sản phẩm dệt may (vải, quần áo), da giày.
-    *   Sản phẩm giấy, nhựa tiêu dùng, thủy tinh.
-    *   Nhôm định hình, sản phẩm kim loại gia công.
-    *   Hóa chất công nghiệp thông thường.
-*   **Lưu ý cho Sale:** Bộ Công Thương là đơn vị tiên phong ban hành Thông tư hướng dẫn TXNG (TT 31/2026/TT-BCT). Nắm chắc quy trình của Bộ này là cơ sở để tư vấn cho các mặt hàng của các Bộ khác khi có thông tư mới.
-
-### 3.3 Bộ Xây dựng - Lĩnh vực Giao thông vận tải (44 sản phẩm)
-*   **Danh mục Rủi ro cao:**
-    *   Phương tiện giao thông: Ô tô các loại, xe mô tô, xe gắn máy, xe cho người khuyết tật.
-    *   Xe chuyên dùng: Cần cẩu bánh lốp/xích, xe nâng, xe san, xe khoan, xe đào, xe xúc...
-    *   Phụ tùng an toàn: Gương ô tô/xe máy, vành bánh xe, lốp hơi các loại, khung xe, bình chịu áp lực.
-*   **Danh mục Rủi ro trung bình:**
-    *   Phụ tùng ô tô, xe máy thông thường.
-    *   Thiết bị giao thông phụ trợ, đèn chiếu sáng phương tiện.
-*   **Lưu ý cho Sale:** Xe chuyên dùng và linh kiện ô tô có quy trình kiểm tra riêng biệt, thời gian thử nghiệm kéo dài. Sale không được tự ý cam kết tiến độ thông quan nhanh đối với nhóm này.
-
-### 3.4 Bộ Xây dựng - Vật liệu xây dựng (31 sản phẩm)
-*   **Danh mục Rủi ro cao:**
-    *   Xi măng, phụ gia bê tông.
-    *   Kính xây dựng: Kính nổi, kính phẳng tôi nhiệt, kính dán nhiều lớp, kính phủ phản quang, kính Low-E.
-    *   Khoáng chất công nghiệp: Thạch cao phospho, xỉ hạt lò cao, tro bay dùng cho bê tông/vữa.
-*   **Danh mục Rủi ro trung bình:**
-    *   Bê tông thương phẩm, vữa xây dựng.
-    *   Vật liệu ốp lát (gạch ceramic, đá nhân tạo), gạch xây dựng.
-    *   Vật liệu chống thấm, cách nhiệt.
-*   **Lưu ý cho Sale:** **Hầu hết vật liệu xây dựng Rủi ro cao thuộc diện KIỂM TRA TRƯỚC THÔNG QUAN**. Hàng không thể thông quan ngay khi về cảng.
-
-### 3.5 Bộ Nông nghiệp & Môi trường (69 sản phẩm)
-*   **Danh mục Rủi ro cao:**
-    *   Thuốc bảo vệ thực vật (chế phẩm diệt côn trùng, trừ nấm, diệt cỏ...).
-    *   Chế phẩm bảo quản gỗ chứa chất diệt côn trùng/trừ nấm.
-*   **Danh mục Rủi ro trung bình:**
-    *   Phân bón các loại (hóa học, hữu cơ, vi sinh).
-    *   Thức ăn chăn nuôi (TĂCN), phụ gia TĂCN.
-    *   Giống cây trồng, giống vật nuôi, giống thủy sản.
-    *   Thuốc thú y, chế phẩm sinh học nông nghiệp.
-*   **Lưu ý cho Sale:** BNNMT sở hữu danh mục Rủi ro trung bình lớn nhất (64 SP), phần lớn áp dụng quy trình kiểm tra hậu kiểm đơn giản hơn.
-
-### 3.6 Bộ Y tế (10 sản phẩm)
-*   **Danh mục Rủi ro cao:**
-    *   Dược liệu làm thuốc (đông dược, thảo dược, tinh dầu làm thuốc...).
-    *   Thực phẩm chức năng (TPCN), thực phẩm bảo vệ sức khỏe.
-    *   Mỹ phẩm có công dụng đặc trị (trị mụn, trị nám, chống nắng, dầu gội đặc trị...).
-    *   Trang thiết bị y tế (máy đo huyết áp, máy trợ thính, dụng cụ phẫu thuật...).
-*   **Danh mục Rủi ro trung bình:**
-    *   Mỹ phẩm thông thường (kem dưỡng ẩm, son môi, sữa rửa mặt không đặc trị).
-*   **Lưu ý cho Sale:** Nhóm dược liệu làm thuốc chịu sự kiểm soát đặc biệt nghiêm ngặt từ Bộ Y tế, cần chuẩn bị đầy đủ giấy tờ kỹ thuật từ nhà sản xuất.
-
-### 3.7 Bộ Nội vụ - Lĩnh vực Phòng cháy chữa cháy (15 sản phẩm)
-*   **Danh mục Rủi ro cao:**
-    *   Bình chữa cháy các loại (bột, khí CO2, bọt foam).
-    *   Hệ thống báo cháy tự động: Đầu báo khói/nhiệt, tủ điều khiển trung tâm, chuông, đèn báo.
-    *   Đầu phun sprinkler tự động.
-    *   Vòi chữa cháy, ống mềm chữa cháy, trục cuộn chữa cháy.
-*   **Danh mục Rủi ro trung bình:**
-    *   Phương tiện PCCC phụ trợ: Thang dây, rìu, xẻng PCCC.
-    *   Tủ đựng thiết bị PCCC chuyên dụng.
-    *   Thiết bị chiếu sáng sự cố (đèn thoát hiểm chỉ dẫn EXIT).
-*   **Lưu ý cho Sale:** Thiết bị PCCC bắt buộc phải có chứng thư kiểm định từ Cục Cảnh sát PCCC và CNCH.
-
-### 3.8 Bộ Công an (21 sản phẩm)
-*   **Danh mục Rủi ro cao:**
-    *   Công cụ hỗ trợ chuyên dụng: Còng số 8, dùi cui điện, súng bắn đạn cao su/hơi cay.
-    *   Thiết bị gây nhiễu, thiết bị phá sóng vô tuyến.
-*   **Danh mục Rủi ro trung bình:**
-    *   Thiết bị an ninh: Camera giám sát an ninh, đầu ghi hình camera, màn hình chuyên dụng.
-    *   Thiết bị kiểm soát ra vào: Cửa từ, barrier tự động, máy đọc thẻ RFID.
-    *   Két sắt, tủ két an toàn bảo mật.
-    *   Thiết bị báo động đột nhập, báo trộm.
-*   **Lưu ý cho Sale:** Các mặt hàng Rủi ro cao thuộc Bộ Công an là mặt hàng nhạy cảm, thuộc diện cấm hoặc hạn chế nhập khẩu thương mại thông thường, bắt buộc phải có giấy phép nhập khẩu chuyên dùng.
-
----
+Tài liệu văn bản này không lưu trữ danh mục sản phẩm cụ thể nhằm tránh sai lệch thông tin khi có sự thay đổi văn bản pháp lý. Nhân viên kinh doanh (Sales) bắt buộc phải đối chiếu dữ liệu trực tiếp trên file Excel tổng hợp hoặc sử dụng công cụ tra cứu tự động nêu trên khi tư vấn cho khách hàng.
 
 ## 4. QUY TRÌNH XỬ LÝ HÀNG NHẬP KHẨU THEO PHÂN LOẠI RỦI RO
 
@@ -223,7 +135,7 @@ graph TD
 4.  **Bước 4: Đồng bộ dữ liệu:** Cập nhật thông tin chi tiết lô hàng lên Cổng TXNG quốc gia và `verigoods.vn`.
 5.  **Bước 5: In dán QR Code:** In mã QR trực tiếp hoặc dán tem QR lên bao bì hàng hóa trước khi đưa ra lưu thông ngoài thị trường.
 
-### 6.3 10 Mục thông tin bắt buộc trên mã QR TXNG (Thông tư 31/2026/TT-BCT)
+### 6.3 10 Mục thông tin bắt buộc trên mã QR TXNG (Thông tư 33/2026/TT-BCT)
 Mã QR TXNG hiển thị cho người tiêu dùng hoặc cơ quan kiểm tra bắt buộc phải thể hiện đầy đủ 10 trường thông tin sau:
 1.  Tên sản phẩm, hàng hóa.
 2.  Hình ảnh sản phẩm thực tế.
