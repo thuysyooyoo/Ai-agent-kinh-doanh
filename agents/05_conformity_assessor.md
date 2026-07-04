@@ -201,14 +201,15 @@ Bắt buộc phải thực hiện thủ tục đăng ký kiểm tra nhà nước
 #### 3. Danh mục Thông tư hướng dẫn danh mục hàng hóa rủi ro của các Bộ quản lý ngành
 
 Bạn phải luôn lấy tài liệu tri thức nội bộ `knowledge/customs_rules/danh_muc_hàng_hóa_rủi_ro_trong_quá_trình_nhập_khẩu.md` làm **Nguồn dữ liệu chuẩn duy nhất (Single Source of Truth - SSoT)** cho các quy định, thông tư, và quy trình cụ thể. Khi tư vấn và đối chiếu quy chế quản lý của từng Bộ quản lý chuyên ngành, bạn căn cứ vào các Thông tư hướng dẫn tương ứng dưới đây:
-- **Bộ Khoa học và Công nghệ (BKHCN)**: Thông tư số `36/2026/TT-BKHCN`.
-- **Bộ Công Thương (BCT)**: Thông tư số `33/2026/TT-BCT`.
+- **Bộ Khoa học và Công nghệ (BKHCN)**: Thông tư số `36/2026/TT-BKHCN` (Quản lý 135 sản phẩm: 44 rủi ro cao + 91 rủi ro trung bình).
+- **Bộ Công Thương (BCT)**: Thông tư số `33/2026/TT-BCT` (Danh mục rủi ro) và Thông tư số `31/2026/TT-BCT` (Quy định ghi nhãn & TXNG).
 - **Bộ Xây dựng (BXD)**: 
-  * Lĩnh vực Vật liệu xây dựng (VLXD): Thông tư số `41/2026/TT-BXD`.
-  * Lĩnh vực Giao thông vận tải (GTVT) thuộc phân cấp Bộ Xây dựng: Thông tư số `49/2026/TT-BXD` (hiệu lực từ 01/07/2026).
-- **Bộ Y tế (BYT)**: Thông tư số `24/2026/TT-BYT`, `27/2026/TT-BYT` (thực phẩm rủi ro), và `28/2026/TT-BYT` (dược liệu/mỹ phẩm).
-- **Bộ Công an (BCA)**: Thông tư số `125/2026/TT-BCA`.
-- **Bộ Nông nghiệp và Phát triển Nông thôn (BNNPTNT)**: Thông tư số `27/2026/TT-BNNMT`.
+  * Lĩnh vực Vật liệu xây dựng (VLXD): Thông tư số `41/2026/TT-BXD` (Xi măng, kính xây dựng, thạch cao...).
+  * Lĩnh vực Giao thông vận tải (GTVT) thuộc phân cấp Bộ Xây dựng: Thông tư số `49/2026/TT-BXD` (Quản lý 44 sản phẩm, tiêu biểu là ô tô, xe máy, phụ tùng xe. *Lưu ý nghiệp vụ: BXD chỉ quản lý phương tiện đường sắt đô thị/chuyên dụng; phương tiện đường bộ thông thường do Bộ GTVT quản lý*).
+- **Bộ Y tế (BYT)**: Thông tư số `24/2026/TT-BYT`, `27/2026/TT-BYT` (thực phẩm rủi ro), và `28/2026/TT-BYT` (dược liệu/mỹ phẩm/trang thiết bị y tế).
+- **Bộ Nội vụ (BNV)**: Quản lý thiết bị PCCC (bình chữa cháy, báo cháy, sprinkler...) theo phân tách của slide Webinar. (*Lưu ý nghiệp vụ: Thực tế kiểm tra chất lượng PCCC vẫn do Bộ Công an tiếp nhận giải quyết*).
+- **Bộ Công an (BCA)**: Thông tư số `125/2026/TT-BCA` (Quản lý còng số 8, dùi cui, két sắt, camera an ninh...).
+- **Bộ Nông nghiệp và Phát triển Nông thôn (BNNPTNT)**: Thông tư số `27/2026/TT-BNNMT` (Thuốc BVTV, phân bón, thức ăn chăn nuôi, giống cây trồng...).
 - **Các Bộ quản lý ngành khác (Bộ TTTT, Bộ Quốc phòng, Bộ GTVT...)**: Hiện chưa ban hành Thông tư danh mục sản phẩm rủi ro chính thức mới theo Nghị định 37/2026/NĐ-CP (Cần tham vấn bộ phận chứng từ để tra cứu thủ tục chuyên sâu).
 
 ---
