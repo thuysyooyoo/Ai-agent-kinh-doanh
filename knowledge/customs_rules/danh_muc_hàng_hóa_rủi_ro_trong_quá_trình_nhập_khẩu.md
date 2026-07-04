@@ -48,7 +48,7 @@ Tài liệu văn bản này không lưu trữ danh mục sản phẩm cụ thể
 
 Mức độ kiểm tra chất lượng đối với hàng hóa nhập khẩu được phân chia theo mức độ rủi ro của sản phẩm (Nghị định 37/2026/NĐ-CP):
 
-### 3.1 Quy trình kiểm tra đối với HÀNG RỦI RO TRUNG BÌNH (Hậu kiểm)
+### 3.1 Quy trình kiểm tra đối với HÀNG RỦI RO TRUNG BÌNH (Công bố trước khi lưu thông)
 
 Doanh nghiệp được phép thông quan lô hàng trước, sau đó thực hiện đăng ký công bố hợp quy trước khi đưa hàng hóa ra lưu thông trên thị trường (Thời gian thông quan thông thường: **1 - 3 ngày**). Gồm 4 trường hợp cụ thể:
 
@@ -64,10 +64,10 @@ Doanh nghiệp được phép thông quan lô hàng trước, sau đó thực hi
 ```mermaid
 graph TD
     A[Bước 1: Thử nghiệm mẫu kiểu loại & Tự công bố hợp quy lên CSDL quốc gia] --> B[Bước 2: Hàng về cảng - Truyền tờ khai & Thông quan ngay lập tức để bán hàng]
-    B --> C[Bước 3: Lưu thông thị trường - Chịu giám sát hậu kiểm & Đăng ký GS1/TXNG]
+    B --> C[Bước 3: Lưu thông thị trường - Chịu kiểm tra giám sát chất lượng trên thị trường & Đăng ký GS1/TXNG]
 ```
 
-### 3.2 Quy trình kiểm tra đối với HÀNG RỦI RO CAO (Tiền kiểm)
+### 3.2 Quy trình kiểm tra đối với HÀNG RỦI RO CAO (Kiểm tra trước khi thông quan)
 
 Bắt buộc phải thực hiện thủ tục đăng ký kiểm tra nhà nước về chất lượng và được cấp Giấy chứng nhận hợp quy từ Tổ chức chứng nhận được chỉ định trước khi thông quan hải quan. Không áp dụng tự đánh giá, chỉ được áp dụng Phương thức 5 hoặc Phương thức 7:
 
@@ -88,9 +88,9 @@ graph TD
 
 ---
 
-## 4. SO SÁNH QUY CHẾ TIỀN KIỂM vs HẬU KIỂM
+## 4. SO SÁNH CƠ CHẾ QUẢN LÝ HÀNG RỦI RO CAO vs HÀNG RỦI RO TRUNG BÌNH
 
-| Tiêu chí | HÀNG RỦI RO CAO (Tiền kiểm) | HÀNG RỦI RO TRUNG BÌNH (Hậu kiểm) |
+| Tiêu chí | Hàng rủi ro cao (Kiểm tra trước thông quan) | Hàng rủi ro trung bình (Công bố trước khi lưu thông) |
 | :--- | :--- | :--- |
 | **Bản chất kiểm tra** | Nhà nước kiểm tra **TRƯỚC** khi thông quan. (Đánh giá theo lô - Phương thức 7) | Doanh nghiệp **TỰ** đánh giá hợp chuẩn. (Đánh giá kiểu loại - Phương thức 1) |
 | **Công bố hợp quy** | Cơ quan có thẩm quyền cấp Giấy chứng nhận hợp quy cho từng lô. | Doanh nghiệp tự công bố hợp quy lên hệ thống CSDL quốc gia. |
@@ -98,7 +98,7 @@ graph TD
 | **Khả năng lưu thông** | **KHÔNG** được phép bán khi chưa hoàn thành thông quan và TXNG. | **CÓ THỂ BÁN NGAY** sau khi thông quan hải quan cửa khẩu. |
 | **Đăng ký mã vạch GS1** | **BẮT BUỘC** (Khai GTIN sản phẩm). | Khuyến khích thực hiện (Phục vụ giảm kiểm tra). |
 | **Truy xuất nguồn gốc (QR)** | **BẮT BUỘC** (Quét mã truy xuất nguồn gốc theo từng lô hàng trước khi bán). | Khuyến khích thực hiện. |
-| **Hoạt động Hậu kiểm** | Áp dụng vĩnh viễn (Kiểm tra đột xuất tại kho/điểm bán của doanh nghiệp). | Áp dụng vĩnh viễn (Tần suất kiểm định đột xuất thấp hơn). |
+| **Kiểm tra thị trường** | Áp dụng vĩnh viễn (Kiểm tra đột xuất tại kho/điểm bán của doanh nghiệp). | Áp dụng vĩnh viễn (Tần suất kiểm định đột xuất thấp hơn). |
 | **Thời gian thông quan dự kiến**| **7 - 14 ngày** (Tùy thuộc tiến độ phòng lab và cơ quan kiểm tra). | **1 - 3 ngày** (Thông quan theo quy trình hải quan thông thường). |
 | **Hậu quả nếu vi phạm** | Không cho thông quan, buộc tái xuất hoặc tiêu hủy lô hàng. | Đình chỉ lưu thông, phạt tiền từ 1-3 lần giá trị thuế trốn/vi phạm chất lượng, thu hồi sản phẩm. |
 
@@ -141,7 +141,7 @@ Doanh nghiệp nhập khẩu được tự động áp dụng cơ chế Giảm k
 1.  **03 lần liên tiếp đạt chuẩn:** 3 lô hàng nhập khẩu liên tiếp trước đó được Cơ quan kiểm tra nhà nước ra thông báo *"ĐÁP ỨNG yêu cầu chất lượng"*.
 2.  **Đồng nhất tuyệt đối:** Lô hàng thuộc diện giảm kiểm tra phải đồng nhất hoàn toàn với 3 lô trước đó về các thông số: Tên sản phẩm, công dụng, nhãn hiệu/thương hiệu, model sản phẩm, đặc tính kỹ thuật, cơ sở sản xuất bên nước ngoài, xuất xứ hàng hóa và do cùng 1 đơn vị nhập khẩu thực hiện.
 3.  **Không bị cảnh báo:** Sản phẩm không nằm trong danh sách cảnh báo mất an toàn trong nước và quốc tế, không thuộc diện kiểm soát đặc thù.
-4.  **Hồ sơ tự lưu:** Doanh nghiệp tự đánh giá điều kiện và lưu trữ 3 bộ thông báo ĐẠT chất lượng của các lô hàng trước làm căn cứ giải trình khi Hậu kiểm, **không cần nộp đơn xin phê duyệt từ cơ quan kiểm tra.**
+4.  **Hồ sơ tự lưu:** Doanh nghiệp tự đánh giá điều kiện và lưu trữ 3 bộ thông báo ĐẠT chất lượng của các lô hàng trước làm căn cứ giải trình khi kiểm tra chất lượng trên thị trường, **không cần nộp đơn xin phê duyệt từ cơ quan kiểm tra.**
 
 ### 6.2 Quy trình thông quan Whitelist liên thông tự động (4 Bước)
 Cơ chế Giảm kiểm tra vận hành thông qua sự liên thông dữ liệu giữa **Hệ thống Hải quan (Cổng một cửa quốc gia)** và **Hệ thống Giám sát chất lượng quốc gia**:

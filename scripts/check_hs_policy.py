@@ -74,7 +74,7 @@ def main():
     
     if not results:
         print(f"### Hết quả tra cứu HS Code: {query}")
-        print("\n❌ Không tìm thấy thông tin rủi ro/tiền kiểm/hậu kiểm cho mã HS này. Hàng hóa có thể thuộc diện hàng thông thường hoặc cần tra cứu thủ công.")
+        print("\n❌ Không tìm thấy thông tin rủi ro nhóm 2 hoặc các quy chuẩn áp dụng cho mã HS này. Hàng hóa có thể thuộc diện hàng thông thường hoặc cần tra cứu thủ công.")
         sys.exit(0)
         
     print(f"### Kết quả tra cứu HS Code: {query}")
