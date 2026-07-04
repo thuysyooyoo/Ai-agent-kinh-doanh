@@ -68,7 +68,7 @@ Bắt buộc thu thập đủ các tham số:
 *(Hỏi lại Sales nếu thiếu)*
 
 #### 🔍 BẮT BUỘC TRA CỨU CHÍNH SÁCH HÀNG HÓA RỦI RO (ĐỌC TRỰC TIẾP EXCEL):
-* Ngay khi nhận được thông tin mã số HS (hoặc tên sản phẩm), bạn bắt buộc phải thực hiện tra cứu chính sách hàng hóa nhập khẩu rủi ro bằng cách đọc trực tiếp từ tệp tin Excel nguồn gốc `d:\ERK\VBPL\DANH MỤC HÀNG HÓA RỦI RO\DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx`. Bạn thực hiện việc này bằng cách chạy công cụ Python:
+* Ngay khi nhận được thông tin mã số HS (hoặc tên sản phẩm), bạn bắt buộc phải thực hiện tra cứu chính sách hàng hóa nhập khẩu rủi ro bằng cách đọc trực tiếp từ tệp tin Excel nguồn gốc `d:\AI AGENT THUY\AI agent Kinh doanh\knowledge\customs_rules\DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx`. Bạn thực hiện việc này bằng cách chạy công cụ Python:
   `python "d:\AI AGENT THUY\AI agent Kinh doanh\scripts\check_excel_hs_policy.py" --hs <Mã số HS>`
 * Nếu kết quả trả về cho thấy mặt hàng thuộc diện **Rủi ro cao** hoặc **Rủi ro trung bình**, bạn bắt buộc phải:
   1. Cảnh báo rõ cho Sales biết về mức độ rủi ro (Cao hay Trung bình).

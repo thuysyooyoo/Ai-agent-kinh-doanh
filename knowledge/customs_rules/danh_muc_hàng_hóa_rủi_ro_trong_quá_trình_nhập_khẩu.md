@@ -40,7 +40,7 @@ Hệ thống quản lý chất lượng đặc thù áp dụng đối với **36
 ## 3. THAM CHIẾU DANH MỤC HÀNG HÓA RỦI RO CHI TIẾT
 
 Chi tiết danh mục hàng hóa rủi ro (bao gồm mã HS, tên sản phẩm, quy chuẩn kỹ thuật quốc gia QCVN áp dụng, mức độ rủi ro trung bình/cao và yêu cầu quản lý chất lượng cụ thể) sẽ luôn được tham chiếu trực tiếp từ:
-1.  **File Excel tổng hợp gốc**: [DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx](file:///D:/ERK/VBPL/DANH%20M%E1%BB%A4C%20H%C3%80NG%20H%C3%93A%20R%E1%BB%A6I%20RO/DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx)
+1.  **File Excel tổng hợp gốc**: [DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx](file:///d:/AI%20AGENT%20THUY/AI%20agent%20Kinh%20doanh/knowledge/customs_rules/DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx)
 2.  **Công cụ tra cứu nhanh**: Chạy lệnh python scripts/check_hs_policy.py --hs <Mã HS> trong hệ thống để tra cứu thời gian thực.
 
 Tài liệu văn bản này không lưu trữ danh mục sản phẩm cụ thể nhằm tránh sai lệch thông tin khi có sự thay đổi văn bản pháp lý. Nhân viên kinh doanh (Sales) bắt buộc phải đối chiếu dữ liệu trực tiếp trên file Excel tổng hợp hoặc sử dụng công cụ tra cứu tự động nêu trên khi tư vấn cho khách hàng.
@@ -190,7 +190,7 @@ graph TD
 Để bảo vệ quyền lợi của Eureka Logistics và tư vấn chính xác cho khách hàng, nhân viên Sale bắt buộc phải tuân thủ nghiêm ngặt **6 việc cần làm ngay** sau đây:
 
 1.  **Phân loại đúng nhóm rủi ro trước khi báo giá:**
-    *   Trước khi báo giá cước vận chuyển, Sale phải tra cứu Phụ lục danh mục hàng hóa rủi ro của Bộ quản lý ngành tương ứng (tra cứu file Excel tổng hợp `DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx` trong hệ thống).
+    *   Trước khi báo giá cước vận chuyển, Sale phải tra cứu Phụ lục danh mục hàng hóa rủi ro của Bộ quản lý ngành tương ứng (tra cứu file Excel tổng hợp `DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx` tại thư mục tri thức `knowledge/customs_rules/`).
     *   Xác định rõ sản phẩm thuộc nhóm **Rủi ro cao** hay **Rủi ro trung bình** và áp dụng quy chuẩn kỹ thuật (QCVN) nào. Sai phân loại sẽ dẫn đến sai toàn bộ dự toán chi phí và tiến độ của đơn hàng.
 2.  **Tư vấn đúng chi phí và tiến độ (Set kỳ vọng khách hàng):**
     *   *Đối với hàng Rủi ro cao:* Cảnh báo trước cho khách hàng về chi phí kiểm tra nhà nước, chi phí thử nghiệm mẫu và chi phí triển khai TXNG. Cộng thêm thời gian chờ kết quả kiểm nghiệm (**+7 đến 14 ngày làm việc**). Tuyệt đối không hứa hẹn hay cam kết thời gian thông quan nhanh như hàng hóa thông thường.

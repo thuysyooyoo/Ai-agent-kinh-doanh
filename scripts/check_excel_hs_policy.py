@@ -118,7 +118,10 @@ def main():
     parser.add_argument("--hs", type=str, required=True, help="Mã HS cần tra cứu (ví dụ: 8507 hoặc 8603)")
     args = parser.parse_args()
     
-    excel_path = r'D:\ERK\VBPL\DANH MỤC HÀNG HÓA RỦI RO\DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx'
+    excel_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        'knowledge', 'customs_rules', 'DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx'
+    )
     query = args.hs.strip()
     
     results = search_excel_hs(query, excel_path)

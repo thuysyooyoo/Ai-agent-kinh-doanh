@@ -22,8 +22,14 @@ def clean_hs_to_digits(hs):
     return codes
 
 def main():
-    excel_path = r'D:\ERK\VBPL\DANH MỤC HÀNG HÓA RỦI RO\DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx'
-    backup_path = r'D:\ERK\VBPL\DANH MỤC HÀNG HÓA RỦI RO\DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP_BACKUP.xlsx'
+    excel_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        'knowledge', 'customs_rules', 'DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx'
+    )
+    backup_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        'knowledge', 'customs_rules', 'DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP_BACKUP.xlsx'
+    )
     
     script_dir = os.path.dirname(os.path.abspath(__file__))
     json_path = os.path.join(script_dir, "..", "knowledge", "customs_rules", "danh_muc_tra_cuu_hs_code_rui_ro.json")
