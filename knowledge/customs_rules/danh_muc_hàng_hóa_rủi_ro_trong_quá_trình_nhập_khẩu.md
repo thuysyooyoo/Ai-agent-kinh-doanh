@@ -25,14 +25,58 @@ Chính sách kiểm tra chất lượng và quản lý hàng hóa nhập khẩu 
 
 Chi tiết danh mục hàng hóa rủi ro (bao gồm mã HS, tên sản phẩm, quy chuẩn kỹ thuật quốc gia QCVN áp dụng, mức độ rủi ro trung bình/cao và yêu cầu quản lý chất lượng cụ thể) sẽ luôn được tham chiếu trực tiếp từ:
 1.  **File Excel tổng hợp gốc**: [DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx](file:///d:/AI%20AGENT%20THUY/AI%20agent%20Kinh%20doanh/knowledge/customs_rules/DANH_MUC_HANG_HOA_RUI_RO_TONG_HOP.xlsx)
-2.  **Công cụ tra cứu nhanh**: Chạy lệnh python scripts/check_hs_policy.py --hs <Mã HS> trong hệ thống để tra cứu thời gian thực.
+2.  **Công cụ tra cứu nhanh**: Chạy lệnh `python scripts/check_excel_hs_policy.py --hs <Mã HS>` trong hệ thống để tra cứu thời gian thực.
 
 Tài liệu văn bản này không lưu trữ danh mục sản phẩm cụ thể nhằm tránh sai lệch thông tin khi có sự thay đổi văn bản pháp lý. Nhân viên kinh doanh (Sales) bắt buộc phải đối chiếu dữ liệu trực tiếp trên file Excel tổng hợp hoặc sử dụng công cụ tra cứu tự động nêu trên khi tư vấn cho khách hàng.
 
+### 2.1 Các Thông tư quy định danh mục hàng hóa rủi ro của các Bộ quản lý chuyên ngành
+
+Để xác định chính xác sản phẩm có mức độ rủi ro trung bình hoặc rủi ro cao đối với từng dòng hàng, Sales cần đối chiếu với các Thông tư hướng dẫn tương ứng của từng Bộ quản lý chuyên ngành dưới đây:
+- **Bộ Khoa học và Công nghệ (BKHCN)**: Thông tư số `36/2026/TT-BKHCN`.
+- **Bộ Công Thương (BCT)**: Thông tư số `33/2026/TT-BCT`.
+- **Bộ Xây dựng (BXD)**:
+  - Lĩnh vực Vật liệu xây dựng (VLXD): Thông tư số `41/2026/TT-BXD`.
+  - Lĩnh vực Giao thông vận tải (GTVT) thuộc phân cấp Bộ Xây dựng: Thông tư số `49/2026/TT-BXD`.
+- **Bộ Y tế (BYT)**: Thông tư số `24/2026/TT-BYT`, `27/2026/TT-BYT` (thực phẩm rủi ro), và `28/2026/TT-BYT` (dược liệu/mỹ phẩm).
+- **Bộ Công an (BCA)**: Thông tư số `125/2026/TT-BCA`.
+- **Bộ Nông nghiệp và Phát triển Nông thôn (BNNPTNT)**: Thông tư số `27/2026/TT-BNNMT`.
+- **Các Bộ quản lý ngành khác (Bộ TTTT, Bộ Quốc phòng, Bộ GTVT...)**: Hiện chưa ban hành Thông tư danh mục sản phẩm rủi ro chính thức mới theo Nghị định 37/2026/NĐ-CP (Sales cần tham vấn bộ phận chứng từ để tra cứu thủ tục chuyên sâu).
+
+---
+
 ## 3. QUY TRÌNH XỬ LÝ HÀNG NHẬP KHẨU THEO PHÂN LOẠI RỦI RO
 
-### 3.1 Quy trình 5 bước áp dụng cho HÀNG RỦI RO CAO (Tiền kiểm)
-Áp dụng cơ chế kiểm tra **TRƯỚC** thông quan (Tiền kiểm) theo Phương thức 7 (Đánh giá theo từng lô hàng):
+Mức độ kiểm tra chất lượng đối với hàng hóa nhập khẩu được phân chia theo mức độ rủi ro của sản phẩm (Nghị định 37/2026/NĐ-CP):
+
+### 3.1 Quy trình kiểm tra đối với HÀNG RỦI RO TRUNG BÌNH (Hậu kiểm)
+
+Doanh nghiệp được phép thông quan lô hàng trước, sau đó thực hiện đăng ký công bố hợp quy trước khi đưa hàng hóa ra lưu thông trên thị trường (Thời gian thông quan thông thường: **1 - 3 ngày**). Gồm 4 trường hợp cụ thể:
+
+*   **Trường hợp 1.1: Tự đánh giá + Phương thức 1** (Phổ biến cho hàng điện tử gia dụng như QCVN 9 - EMC):
+    *   *Quy trình*: Gửi mẫu kiểu loại đi thử nghiệm tại phòng lab chỉ định (QUATEST...) trước khi nhập khẩu -> Hàng về, làm thủ tục hải quan và thông quan ngay -> Doanh nghiệp lập Báo cáo tự đánh giá (Phụ lục V) và Bản đăng ký (Phụ lục IV - tích chọn "Tự đánh giá", ghi ngày ký Báo cáo tự đánh giá) -> Nộp hồ sơ trực tuyến qua `nqi.gov.vn` -> Nhận số tiếp nhận -> Dán nhãn hợp quy CR và nhãn phụ -> Đưa sản phẩm ra bán trên thị trường.
+*   **Trường hợp 1.2: Tự đánh giá + Phương thức 5 hoặc Phương thức 7**:
+    *   *Quy trình*: Tương tự như Trường hợp 1.1, nhưng căn cứ kết quả thử nghiệm trong Báo cáo tự đánh giá (Phụ lục V) sẽ là mẫu điển hình kết hợp đánh giá giám sát nhà máy (Phương thức 5) hoặc kết quả thử nghiệm mẫu lấy theo từng lô hàng cụ thể nhập khẩu (Phương thức 7).
+*   **Trường hợp 1.3: Tổ chức chứng nhận đánh giá + Phương thức 5**:
+    *   *Quy trình*: Doanh nghiệp thuê tổ chức chứng nhận chỉ định đánh giá chứng nhận hệ thống sản xuất tại nhà máy và mẫu điển hình của nhà sản xuất nước ngoài -> Được cấp Giấy chứng nhận hợp quy (hiệu lực 3 năm) -> Khi hàng nhập khẩu về, hải quan thông quan ngay -> Doanh nghiệp lập Bản đăng ký công bố (Phụ lục IV - tích chọn "Tổ chức chứng nhận đánh giá", điền tên tổ chức, số GCN, ngày cấp) -> Nộp hồ sơ công bố -> Dán nhãn CR và lưu thông.
+*   **Trường hợp 1.4: Tổ chức chứng nhận đánh giá + Phương thức 7 (Đánh giá theo lô)**:
+    *   *Quy trình*: Hàng về, làm thủ tục thông quan đưa hàng về kho -> Tổ chức chứng nhận chỉ định đến kho lấy mẫu ngẫu nhiên của lô hàng đem đi thử nghiệm -> Cấp Giấy chứng nhận hợp quy cho riêng lô hàng đó -> Doanh nghiệp lập Bản đăng ký công bố (Phụ lục IV - tích chọn "Tổ chức chứng nhận đánh giá", điền thông tin lô hàng và GCN) -> Nộp hồ sơ công bố -> Dán nhãn CR và lưu thông.
+
+```mermaid
+graph TD
+    A[Bước 1: Thử nghiệm mẫu kiểu loại & Tự công bố hợp quy lên CSDL quốc gia] --> B[Bước 2: Hàng về cảng - Truyền tờ khai & Thông quan ngay lập tức để bán hàng]
+    B --> C[Bước 3: Lưu thông thị trường - Chịu giám sát hậu kiểm & Đăng ký GS1/TXNG]
+```
+
+### 3.2 Quy trình kiểm tra đối với HÀNG RỦI RO CAO (Tiền kiểm)
+
+Bắt buộc phải thực hiện thủ tục đăng ký kiểm tra nhà nước về chất lượng và được cấp Giấy chứng nhận hợp quy từ Tổ chức chứng nhận được chỉ định trước khi thông quan hải quan. Không áp dụng tự đánh giá, chỉ được áp dụng Phương thức 5 hoặc Phương thức 7:
+
+*   **Trường hợp 2.1: Chứng nhận theo Phương thức 5 (Chứng nhận dài hạn mẫu điển hình - Thông quan: 1 - 2 ngày)**:
+    *   *Quy trình*: Đã có sẵn Giấy chứng nhận hợp quy Phương thức 5 còn hiệu lực (3 năm) cấp cho dòng sản phẩm đó -> Khi hàng về cửa khẩu, doanh nghiệp đăng ký kiểm tra nhà nước trên Cổng một cửa quốc gia đính kèm GCN hợp quy -> Cơ quan kiểm tra ra Thông báo kết quả kiểm tra đạt yêu cầu chất lượng -> Hải quan cho thông quan ngay -> Dán nhãn CR, đăng ký mã truy xuất nguồn gốc (nếu có yêu cầu) -> Đưa ra thị trường.
+*   **Trường hợp 2.2: Chứng nhận theo Phương thức 7 (Đánh giá lấy mẫu thử nghiệm theo lô - Thông quan: 7 - 14 ngày)**:
+    *   *Quy trình*: Truyền tờ khai hải quan -> Đăng ký kiểm tra chất lượng nhà nước trên Cổng một cửa quốc gia -> Xin đưa hàng về kho bảo quản của doanh nghiệp (Eureka) bảo quản nghiêm ngặt -> Tổ chức chứng nhận chỉ định đến kho kiểm tra thực tế và lấy mẫu thử nghiệm -> Chờ phòng lab cấp phiếu test ĐẠT và tổ chức chứng nhận cấp Giấy chứng nhận hợp quy theo lô -> Nộp bổ sung GCN lên hệ thống Một cửa quốc gia -> Cơ quan kiểm tra ra Thông báo đạt chất lượng -> Hải quan duyệt thông quan cho lô hàng -> Dán nhãn CR, dán mã QR truy xuất -> Đưa ra thị trường.
+    *   > [!CAUTION]
+        > **TUYỆT ĐỐI KHÔNG ĐƯỢC BÁN HOẶC DI CHUYỂN HÀNG HÓA** khi đang để ở trạng thái đưa về kho bảo quản Eureka ở bước này. Tự ý tiêu thụ sẽ bị xử phạt hành chính nặng và tịch thu hàng.
 
 ```mermaid
 graph TD
@@ -41,50 +85,6 @@ graph TD
     C --> D[Bước 4: Nhận Giấy CN hợp quy đạt chuẩn & Hoàn tất Hải quan thông quan]
     D --> E[Bước 5: Định danh điện tử lô hàng & Đăng ký mã QR TXNG để bán hàng]
 ```
-
-1.  **Bước 1: Chuẩn bị trước khi hàng về:**
-    *   Đối chiếu quy chuẩn kỹ thuật (QCVN) tương ứng với sản phẩm.
-    *   Chuẩn bị mẫu thử nghiệm đại diện trước để kiểm tra tính tương thích và thử nghiệm kiểu loại (nếu cần).
-    *   Chuẩn bị các tài liệu tự công bố hoặc kiểm tra ban đầu từ nhà sản xuất.
-2.  **Bước 2: Hàng về cảng - Đăng ký kiểm tra Nhà nước:**
-    *   Truyền tờ khai hải quan nhập khẩu.
-    *   Nộp hồ sơ Đăng ký kiểm tra chất lượng nhà nước lên Cổng một cửa quốc gia.
-    *   Làm thủ tục xin cơ quan hải quan cho phép đưa hàng hóa về địa điểm bảo quản được phê duyệt (kho Eureka).
-    *   **HÀNG LÚC NÀY CHƯA THÔNG QUAN.**
-3.  **Bước 3: Lấy mẫu tại kho - Thử nghiệm:**
-    *   Hàng hóa được vận chuyển và lưu trữ nghiêm ngặt tại kho của Eureka.
-    *   > [!CAUTION]
-        > **TUYỆT ĐỐI KHÔNG ĐƯỢC BÁN HOẶC DI CHUYỂN HÀNG HÓA.** Hàng tại kho Eureka ở bước này mới chỉ ở trạng thái bảo quản chờ kiểm tra. Tự ý tiêu thụ sẽ bị xử phạt hành chính nặng và tịch thu hàng.
-    *   Tổ chức chứng nhận được chỉ định tiến hành đến kho để lấy mẫu thử nghiệm ngẫu nhiên, niêm phong mẫu và gửi đi kiểm định QCVN.
-4.  **Bước 4: Có Giấy chứng nhận hợp quy - Hoàn tất thông quan:**
-    *   Sau khi có Giấy chứng nhận hợp quy ĐẠT chuẩn từ trung tâm kiểm định, bộ phận chứng từ Eureka nộp bổ sung lên hệ thống Cổng một cửa quốc gia.
-    *   Cơ quan kiểm tra nhà nước đối chiếu hồ sơ và cấp "Thông báo kết quả kiểm tra nhà nước đáp ứng yêu cầu chất lượng".
-    *   Hải quan chính thức ra quyết định **THÔNG QUAN** lô hàng.
-5.  **Bước 5: Truy xuất nguồn gốc - ĐƯỢC PHÉP LƯU THÔNG:**
-    *   Đăng ký định danh lô hàng trên Cổng TXNG quốc gia (ghi nhận thông tin mã lô, ngày sản xuất, hạn sử dụng, chứng nhận QCVN...).
-    *   In và dán mã QR Code TXNG theo lô lên bao bì từng sản phẩm.
-    *   Hàng hóa chính thức được phép xuất kho và bày bán trên thị trường.
-
-### 3.2 Quy trình 3 bước áp dụng cho HÀNG RỦI RO TRUNG BÌNH (Hậu kiểm)
-Áp dụng cơ chế kiểm tra **SAU** thông quan (Doanh nghiệp tự đánh giá và công bố hợp quy):
-
-```mermaid
-graph TD
-    A[Bước 1: Thử nghiệm mẫu kiểu loại & Tự công bố hợp quy lên CSDL quốc gia] --> B[Bước 2: Hàng về cảng - Truyền tờ khai & Thông quan ngay lập tức để bán hàng]
-    B --> C[Bước 3: Lưu thông thị trường - Chịu giám sát hậu kiểm & Đăng ký GS1/TXNG]
-```
-
-1.  **Bước 1: Chuẩn bị trước khi hàng về:**
-    *   Sử dụng mẫu đại diện kiểu/loại (do nhà sản xuất cung cấp trước hoặc lấy từ lô hàng trước) gửi đi thử nghiệm tại phòng lab được công nhận.
-    *   Khi có kết quả đạt chuẩn, doanh nghiệp tiến hành **Tự công bố hợp quy** lên Cơ sở dữ liệu chất lượng quốc gia.
-    *   *Ưu điểm:* Kết quả công bố hợp quy này có hiệu lực áp dụng cho toàn bộ kiểu/loại sản phẩm đó (model đó), không cần phải làm lại cho từng lô hàng nhập khẩu sau này.
-2.  **Bước 2: Hàng về cảng - Thông quan ngay:**
-    *   Eureka truyền tờ khai hải quan nhập khẩu kèm theo số tiếp nhận Tự công bố hợp quy.
-    *   Hải quan đối chiếu và thực hiện **THÔNG QUAN NGAY LẬP TỨC** mà không cần giữ hàng để kiểm tra chất lượng hay chờ kết quả thử nghiệm.
-    *   Hàng đưa về kho Eureka và **CÓ THỂ BÁN CHO KHÁCH HÀNG NGAY**.
-3.  **Bước 3: Hậu kiểm & Khuyến nghị TXNG:**
-    *   Hàng hóa lưu thông bình thường trên thị trường nhưng vẫn chịu sự giám sát Hậu kiểm đột xuất của cơ quan quản lý.
-    *   Khuyến nghị khách hàng đăng ký mã vạch GS1 và thực hiện TXNG để tối ưu hóa quy trình thông quan tự động thông qua cơ chế Whitelist.
 
 ---
 
