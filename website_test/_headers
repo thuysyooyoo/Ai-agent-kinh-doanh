@@ -1,0 +1,26 @@
+# ═══════════════════════════════════════════════
+# Eureka Logistics — Netlify Security Headers
+# Deploy: đặt file này tại root cùng index.html
+# ═══════════════════════════════════════════════
+
+/*
+  # Chặn clickjacking (iframe embed)
+  X-Frame-Options: DENY
+
+  # Chặn MIME-type sniffing
+  X-Content-Type-Options: nosniff
+
+  # Chặn leak referrer
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Bảo vệ XSS cơ bản (fallback cho trình duyệt cũ)
+  X-XSS-Protection: 1; mode=block
+
+  # Chỉ cho phép HTTPS
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+  # Content Security Policy — chặn inline script injection
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.sheetjs.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://*.googleusercontent.com https://*.google.com https://*.supabase.co https://api.ipify.org https://ipinfo.io https://ipapi.co; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+
+  # Chặn tính năng nguy hiểm
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()

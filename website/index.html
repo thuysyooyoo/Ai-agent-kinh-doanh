@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eureka Logistics — Ước Tính Giá Khai Báo 1 Sổ</title>
+  <meta name="description" content="Công cụ ước tính giá khai báo và giá xuất hóa đơn theo phương pháp 1 sổ cho hàng ủy thác gom cont (LCL) và nguyên cont (FCL) — Eureka Logistics 2026">
+  <meta name="robots" content="noindex, nofollow">
+  
+  <!-- PWA Meta and Links -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#e8734a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Eureka 1 Sổ">
+  <link rel="apple-touch-icon" href="logo.jpg">
+  
+  <link rel="stylesheet" href="style.css?v=2.2.0">
+  <script>
+    window.onerror = function(message, source, lineno, colno, error) {
+      // Chỉ log warning, không hiện banner đỏ đối với lỗi CORS / Script error dòng 0
+      if (message === 'Script error.' || lineno === 0 || !source) {
+        console.warn('[CORS / External Script Warning]:', message, 'at', source);
+        return false; // Cho phép trình duyệt tiếp tục xử lý
+      }
+      
+      const div = document.createElement('div');
+      div.style.position = 'fixed';
+      div.style.top = '0';
+      div.style.left = '0';
+      div.style.width = '100%';
+      div.style.background = '#fee2e2';
+      div.style.color = '#991b1b';
+      div.style.padding = '12px 20px';
+      div.style.zIndex = '999999';
+      div.style.borderBottom = '3px solid #f87171';
+      div.style.fontFamily = 'monospace';
+      div.style.fontSize = '14px';
+      div.style.fontWeight = 'bold';
+      div.style.boxShadow = '0 4px 10px rgba(0,0,0,0.3)';
+      div.innerHTML = `[Lỗi JS] ${message}<br>File: ${source}<br>Dòng: ${lineno}:${colno}`;
+      document.body.appendChild(div);
+      return false;
+    };
+  </script>
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <!-- html-docx-js: convert HTML to real .docx (OOXML) -->
+  <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+
+</head>
+<body>
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <img src="logo.jpg" alt="Eureka Logistics" class="header-logo">
+        <div class="header-titles">
+          <span class="header-company">Eureka Logistics</span>
+          <span class="header-subtitle">Ước Tính Giá Khai Báo 1 Sổ</span>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div class="header-badge">
+          <span class="dot"></span>
+          Phân bổ theo Trị giá hàng hóa (C2)
+        </div>
+        <div id="user-profile-section" style="display:none; align-items:center; gap:10px;">
+          <span style="color:#fff; font-size:0.85rem; font-weight:600;"><span id="current-username">admin</span></span>
+          <button id="profile-settings-btn" class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem; border-color:rgba(255,255,255,0.4); color:#fff; background:transparent;">Cài Đặt</button>
+          <button id="header-admin-btn" class="btn btn-secondary" style="display:none; padding:4px 10px; font-size:0.75rem; border-color:rgba(255,255,255,0.4); color:#fff; background:transparent;">Quản Trị</button>
+          <button id="logout-btn" class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem; border-color:rgba(255,255,255,0.4); color:#fff; background:transparent;">Đăng xuất</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="main-container">
+
+    <!-- Exchange Rate -->
+    <div class="exchange-rate-bar animate-in" style="display:flex; flex-wrap:wrap; gap:16px; align-items:center;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div class="er-label">Tỷ giá USD/VND:</div>
+        <input type="text" id="exchange-rate" class="er-input" value="25.900" placeholder="25.900" inputmode="decimal" style="width:100px;">
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div class="er-label">¥ Tỷ giá RMB/VND:</div>
+        <input type="text" id="exchange-rate-rmb" class="er-input" value="3.600" placeholder="3.600" inputmode="decimal" style="width:80px;">
+      </div>
+      <span class="er-unit" style="margin-left:auto;">Nhập thủ công theo tỷ giá bán Vietcombank</span>
+    </div>
+
+    <nav class="tab-nav animate-in" style="animation-delay: 0.1s">
+      <button class="tab-btn active" data-tab="tab-lcl" id="tab-btn-lcl">
+        Hàng Gom Cont (LCL)
+      </button>
+      <button class="tab-btn" data-tab="tab-fcl" id="tab-btn-fcl">
+        Hàng Nguyên Cont (FCL)
+      </button>
+      <button class="tab-btn" data-tab="tab-history" id="tab-btn-history">
+        Lịch Sử Tính Toán
+      </button>
+      <button class="tab-btn" data-tab="tab-buyers" id="tab-btn-buyers">
+        Danh Bạ Khách Hàng
+      </button>
+      <button class="tab-btn" data-tab="tab-support" id="tab-btn-support">
+        Công Cụ Hỗ Trợ
+      </button>
+      <button class="tab-btn" data-tab="tab-about" id="tab-btn-about">
+        Giới Thiệu
+      </button>
+    </nav>
+
+    <!-- ═══════════════════════════════════ -->
+    <!--           TAB 1: LCL               -->
+    <!-- ═══════════════════════════════════ -->
+    <div class="tab-content active" id="tab-lcl">
+
+      <!-- LCL Shipment Parameters -->
+      <div class="section-card animate-in" style="animation-delay: 0.12s">
+        <div class="section-header" style="justify-content: space-between; align-items: center;">
+          <div>
+            <div class="section-title">Thông Số Lô Hàng & Tuyến Đường LCL</div>
+            <div class="section-desc">Khai báo thông tin tuyến vận chuyển, khối lượng và VIP level để tự động tra cước</div>
+          </div>
+          <button type="button" id="btn-voice-lcl" class="btn btn-voice" title="Nhập thông số bằng giọng nói">
+            <span class="voice-label">Giọng nói</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Đường vận chuyển</label>
+              <select id="lcl-duong-vc" class="form-input" style="cursor:pointer;">
+                <option value="Biển">Biển (Sea LCL)</option>
+                <option value="Bộ">Bộ (Road LCL)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kho nhận TQ</label>
+              <select id="lcl-kho-tq" class="form-input" style="cursor:pointer;">
+                <option value="Quảng Châu">Quảng Châu</option>
+                <option value="Bằng Tường">Bằng Tường</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kho giao VN</label>
+              <select id="lcl-kho-vn" class="form-input" style="cursor:pointer;">
+                <option value="Hà Nội">Hà Nội</option>
+                <option value="HCM">TP. Hồ Chí Minh</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hạng VIP khách hàng</label>
+              <select id="lcl-vip" class="form-input" style="cursor:pointer;">
+                <option value="Basic">Hạng Basic</option>
+                <option value="Pro" selected>Hạng Pro (-10%)</option>
+                <option value="Premium">Hạng Premium (-20%)</option>
+                <option value="Elite">Hạng Elite (-30%)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Thể tích thực tế (CBM)</label>
+              <div class="input-suffix">
+                <input type="text" id="lcl-so-khoi" class="form-input" placeholder="0" inputmode="decimal">
+                <span class="suffix">m³</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Trọng lượng thực tế (KG)</label>
+              <div class="input-suffix">
+                <input type="text" id="lcl-so-kg" class="form-input" placeholder="0" inputmode="decimal">
+                <span class="suffix">kg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LCL Shared Costs -->
+      <div class="section-card animate-in" style="animation-delay: 0.15s">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Chi Phí Chung Toàn Lô (LCL)</div>
+            <div class="section-desc">Các khoản phí sẽ được phân bổ theo tỷ lệ trị giá hàng hóa cho từng mặt hàng</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="shared-cost-grid">
+            <!-- Item 2 -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <label class="form-label" style="margin-bottom:0;"><span class="label-tag">2</span> Tổng cước VC TQ → VN</label>
+                <label class="switch-container">
+                  <input type="checkbox" id="lcl-override-cuoc-vc" class="switch-input">
+                  <span class="switch-label"></span>
+                  <span>Nhập tay</span>
+                </label>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="lcl-cuoc-vc" class="form-input" placeholder="0" inputmode="numeric" disabled>
+                  <select id="lcl-cuoc-vc-currency" class="suffix-select" disabled>
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+                <input type="text" id="lcl-cuoc-vc-comment" class="form-input shared-cost-card-comment" placeholder="Ghi chú in báo giá (tùy chọn)...">
+              </div>
+              <div id="lcl-cuoc-vc-explain" class="calc-explanation" style="display:none;"></div>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <label class="form-label" style="margin-bottom:0;"><span class="label-tag">3</span> Tổng phí ủy thác</label>
+                <label class="switch-container">
+                  <input type="checkbox" id="lcl-override-phi-ut" class="switch-input">
+                  <span class="switch-label"></span>
+                  <span>Nhập tay</span>
+                </label>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="lcl-phi-ut" class="form-input" placeholder="0" inputmode="numeric" disabled>
+                  <select id="lcl-phi-ut-currency" class="suffix-select" disabled>
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+                <input type="text" id="lcl-phi-ut-comment" class="form-input shared-cost-card-comment" placeholder="Ghi chú in báo giá (tùy chọn)...">
+              </div>
+              <div id="lcl-phi-ut-explain" class="calc-explanation" style="display:none;"></div>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <label class="form-label" style="margin-bottom:0;"><span class="label-tag">4</span> Tổng phí rủi ro</label>
+                <label class="switch-container">
+                  <input type="checkbox" id="lcl-override-phi-rr" class="switch-input">
+                  <span class="switch-label"></span>
+                  <span>Nhập tay</span>
+                </label>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="lcl-phi-rr" class="form-input" placeholder="0" inputmode="numeric" disabled>
+                  <select id="lcl-phi-rr-currency" class="suffix-select" disabled>
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+                <input type="text" id="lcl-phi-rr-comment" class="form-input shared-cost-card-comment" placeholder="Ghi chú in báo giá (tùy chọn)...">
+              </div>
+              <div id="lcl-phi-rr-explain" class="calc-explanation" style="display:none;"></div>
+            </div>
+
+            <!-- Item 5 -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <div>
+                  <label class="form-label" style="margin-bottom:2px;"><span class="label-tag">5</span> Tổng phí khác TQ + VN (không VAT)</label>
+                  <span class="form-hint">Phí nội địa, bến bãi chặng TQ + VN không có hóa đơn VAT</span>
+                </div>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="lcl-phi-khac-tq" class="form-input" placeholder="0" inputmode="numeric">
+                  <select id="lcl-phi-khac-tq-currency" class="suffix-select">
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+                <input type="text" id="lcl-phi-khac-tq-comment" class="form-input shared-cost-card-comment" placeholder="Ghi chú in báo giá (tùy chọn)...">
+              </div>
+              <div id="lcl-phi-khac-tq-explain" class="calc-explanation" style="display:none;"></div>
+            </div>
+
+            <!-- Item 6 -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <label class="form-label" style="margin-bottom:0;"><span class="label-tag">6</span> Phí VC TQ (cước QT)</label>
+                <label class="switch-container">
+                  <input type="checkbox" id="lcl-override-phi-vc-tq" class="switch-input">
+                  <span class="switch-label"></span>
+                  <span>Nhập tay</span>
+                </label>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="lcl-phi-vc-tq" class="form-input" placeholder="0" inputmode="numeric" disabled>
+                  <select id="lcl-phi-vc-tq-currency" class="suffix-select" disabled>
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+                <input type="text" id="lcl-phi-vc-tq-comment" class="form-input shared-cost-card-comment" placeholder="Ghi chú in báo giá (tùy chọn)...">
+              </div>
+              <div id="lcl-phi-vc-tq-explain" class="calc-explanation" style="display:none;"></div>
+            </div>
+
+            <!-- Item Chiết khấu -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <div>
+                  <label class="form-label" style="margin-bottom:2px;">Chiết khấu (giảm trừ)</label>
+                  <span class="form-hint">Chiết khấu giảm trừ trực tiếp trên giá cước (nếu có)</span>
+                </div>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="lcl-chiet-khau" class="form-input" placeholder="0" inputmode="numeric">
+                  <select id="lcl-chiet-khau-currency" class="suffix-select">
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+                <input type="text" id="lcl-chiet-khau-comment" class="form-input shared-cost-card-comment" placeholder="Ghi chú in báo giá (tùy chọn)...">
+              </div>
+              <div id="lcl-chiet-khau-explain" class="calc-explanation" style="display:none;"></div>
+            </div>
+
+            <!-- Item 8 -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <div>
+                  <label class="form-label" style="margin-bottom:2px;"><span class="label-tag">8</span> Tổng phí khác VN (có HĐ, chưa VAT)</label>
+                  <span class="form-hint">Phí nội địa VN, dỡ hàng...</span>
+                </div>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="lcl-phi-khac-vn" class="form-input" placeholder="0" inputmode="numeric">
+                  <select id="lcl-phi-khac-vn-currency" class="suffix-select">
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+                <input type="text" id="lcl-phi-khac-vn-comment" class="form-input shared-cost-card-comment" placeholder="Ghi chú in báo giá (tùy chọn)...">
+              </div>
+              <div id="lcl-phi-khac-vn-explain" class="calc-explanation" style="display:none;"></div>
+            </div>
+
+            <!-- Item: Giá vốn lô hàng (R3 Expected Profit) -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <label class="form-label" style="margin-bottom:0;">
+                  <span class="label-tag" style="background:#059669;">vốn</span> Giá vốn lô hàng (Cost Price)
+                </label>
+                <label class="switch-container">
+                  <input type="checkbox" id="lcl-override-cost-check" class="switch-input">
+                  <span class="switch-label"></span>
+                  <span>Ghi đè giá gốc</span>
+                </label>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="lcl-manual-cost-input" class="form-input" placeholder="0" inputmode="numeric" disabled>
+                  <span class="suffix">VND</span>
+                </div>
+                <span id="lcl-manual-cost-explain" class="explain-text" style="display:none; font-size:0.75rem; color:var(--text-muted); margin-top:4px;"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bộ cộng dồn chi phí LCL -->
+          <div class="accumulator-box" style="margin-top:20px; padding-top:20px; border-top:1.5px dashed var(--border);">
+            <div style="font-weight:700; font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+              Công Cụ Cộng Dồn & Phân Loại Chi Phí
+            </div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+              <div class="form-group" style="flex:2; min-width:200px;">
+                <div class="form-label" style="font-size:0.75rem; color:var(--text-muted);">Số tiền phát sinh</div>
+                <div class="input-suffix">
+                  <input type="text" id="lcl-acc-amount" class="form-input" placeholder="0" inputmode="numeric" style="padding-right: 75px;">
+                  <select id="lcl-acc-currency" class="suffix-select" style="width: 65px;">
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group" style="flex:2; min-width:180px;">
+                <div class="form-label" style="font-size:0.75rem; color:var(--text-muted);">Giá nền (giá vốn - nếu có)</div>
+                <input type="text" id="lcl-acc-base" class="form-input" placeholder="Để trống = Giá báo" inputmode="numeric">
+              </div>
+
+              <div class="form-group" style="flex:3; min-width:220px;">
+                <div class="form-label" style="font-size:0.75rem; color:var(--text-muted);">Phân loại cộng dồn vào mục</div>
+                <select id="lcl-acc-target" class="form-input" style="cursor:pointer;">
+                  <option value="lcl-cuoc-vc">(2) Tổng cước VC TQ → VN</option>
+                  <option value="lcl-phi-ut">(3) Tổng phí ủy thác</option>
+                  <option value="lcl-phi-rr">(4) Tổng phí rủi ro</option>
+                  <option value="lcl-phi-khac-tq">(5) Tổng phí khác TQ + VN (không có VAT)</option>
+                  <option value="lcl-phi-khac-vn">(8) Tổng phí khác VN (có HĐ, chưa VAT)</option>
+                </select>
+              </div>
+              <div class="form-group" style="flex:3; min-width:200px;">
+                <div class="form-label" style="font-size:0.75rem; color:var(--text-muted);">Tên phí con / Ghi chú</div>
+                <input type="text" id="lcl-acc-note" class="form-input" placeholder="Ví dụ: Phí nâng hạ, THC...">
+              </div>
+              <button type="button" class="btn btn-primary" id="lcl-acc-btn" style="padding:10px 20px;">
+                ＋ Cộng dồn vào
+              </button>
+            </div>
+            <!-- Sub-fees list preview on web -->
+            <div id="lcl-acc-list-container" style="margin-top:14px; display:none;">
+              <div style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">Danh sách phí con đã cộng dồn:</div>
+              <div id="lcl-acc-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LCL Items -->
+      <div class="section-card animate-in" style="animation-delay: 0.2s">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Danh Sách Mặt Hàng</div>
+            <div class="section-desc">Nhập thông tin từng mặt hàng — thuế suất riêng cho từng loại</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="items-container">
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th style="width:50px">#</th>
+                  <th>Tên mặt hàng</th>
+                  <th style="width:80px">Số lượng</th>
+                  <th style="width:200px">Giá trị hàng</th>
+                  <th style="width:85px">% Thuế NK</th>
+                  <th style="width:85px">% Thuế khác</th>
+                  <th style="width:75px">% VAT</th>
+                  <th style="width:50px"></th>
+                </tr>
+              </thead>
+              <tbody id="lcl-items-body">
+                <tr data-index="1">
+                  <td><div class="row-number">1</div></td>
+                  <td><input type="text" class="item-input name-input" placeholder="Tên mặt hàng" data-field="name"></td>
+                  <td><input type="text" class="item-input small" placeholder="0" data-field="qty" inputmode="numeric"></td>
+                  <td>
+                    <div style="display:flex; gap:4px; align-items:center;">
+                      <input type="text" class="item-input" placeholder="0" data-field="value" inputmode="numeric" style="flex:1; min-width:80px;">
+                      <select class="item-input currency-select" data-field="currency" style="width:65px; padding:2px 4px; font-size:0.8rem; cursor:pointer;">
+                        <option value="VND">VND</option>
+                        <option value="USD">USD</option>
+                        <option value="RMB">RMB</option>
+                      </select>
+                    </div>
+                  </td>
+                  <td><input type="text" class="item-input small" placeholder="0" data-field="taxNK" data-type="percent" inputmode="decimal"></td>
+                  <td><input type="text" class="item-input small" placeholder="0" data-field="taxOther" data-type="percent" inputmode="decimal"></td>
+                  <td><input type="text" class="item-input small" value="8" data-field="vat" data-type="percent" inputmode="decimal"></td>
+                  <td><button type="button" class="btn btn-danger btn-icon remove-item-btn" title="Xóa">X</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="action-bar">
+            <div class="action-bar-left">
+              <button type="button" class="btn btn-secondary" id="lcl-add-item">
+                Thêm mặt hàng
+              </button>
+              <button type="button" class="btn btn-secondary" id="lcl-import-btn">
+                Nhập từ Excel
+              </button>
+              <button type="button" class="btn btn-secondary" id="lcl-template-btn">
+                Tải mẫu Excel
+              </button>
+              <input type="file" id="lcl-file-input" accept=".xlsx, .xls, .csv" style="display:none;">
+            </div>
+            <div class="action-bar-right">
+              <button type="button" class="btn btn-primary btn-lg" id="lcl-calc-btn">
+                Tính toán phân bổ
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LCL Results -->
+      <div class="results-section" id="lcl-results">
+        <div class="section-card">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Kết Quả Ước Tính 1 Sổ — LCL Gom Cont</div>
+              <div class="section-desc">Phân bổ theo trị giá hàng hóa (C2) • Đơn vị: VND</div>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="results-wrapper">
+              <table class="results-table">
+                <thead>
+                  <tr>
+                    <th>Mặt hàng</th>
+                    <th>SL</th>
+                    <th>Tỷ lệ PB</th>
+                    <th>(1) Giá trị hàng</th>
+                    <th>(2) Cước VC</th>
+                    <th>(3) Phí UT</th>
+                    <th>(4) Phí RR</th>
+                    <th>(5) Phí khác TQ+VN (ko VAT)</th>
+                    <th>(6) Phí VC TQ</th>
+                    <th>(7) Phí VC VN</th>
+                    <th>(8) Phí VN</th>
+                    <th>(9) Giá CIF/DAP</th>
+                    <th>(10) NK%</th>
+                    <th>(11) Khác%</th>
+                    <th>(12) VAT%</th>
+                    <th>(13) Thuế TT</th>
+                    <th>(14) VAT</th>
+                    <th>(15) Tổng CP+TT</th>
+                    <th>(16) Giá XHĐ</th>
+                    <th>(17) Chuyển thêm</th>
+                    <th>ĐG DAP (USD)</th>
+                    <th>ĐG HĐ (VND)</th>
+                  </tr>
+                </thead>
+                <tbody id="lcl-results-body"></tbody>
+              </table>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+              <div class="summary-card">
+                <div class="sc-label">Tổng giá trị hàng</div>
+                <div class="sc-value" id="lcl-sum-total-value">0 ₫</div>
+              </div>
+              <div class="summary-card">
+                <div class="sc-label">Tổng giá CIF/DAP</div>
+                <div class="sc-value" id="lcl-sum-cif">0 ₫</div>
+              </div>
+              <div class="summary-card">
+                <div class="sc-label">Tổng thuế trực tiếp</div>
+                <div class="sc-value" id="lcl-sum-tax">0 ₫</div>
+              </div>
+              <div class="summary-card accent">
+                <div class="sc-label">Giá trị xuất HĐ (đã VAT)</div>
+                <div class="sc-value" id="lcl-sum-invoice">0 ₫</div>
+              </div>
+              <div class="summary-card">
+                <div class="sc-label">Số tiền chuyển thêm</div>
+                <div class="sc-value" id="lcl-sum-extra">0 ₫</div>
+              </div>
+              <div class="summary-card cost-card">
+                <div class="sc-label">Giá vốn lô hàng</div>
+                <div class="sc-value" id="lcl-sum-cost-price">0 ₫</div>
+                <div class="sc-subtext" id="lcl-sum-cost-type" style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">Tự động từ hệ thống</div>
+              </div>
+              <div class="summary-card profit-card">
+                <div class="sc-label">
+                  <span>Lợi nhuận dự kiến</span>
+                  <span class="profit-badge" id="lcl-sum-profit-margin">0.00%</span>
+                </div>
+                <div class="sc-value" id="lcl-sum-expected-profit">0 ₫</div>
+              </div>
+            </div>
+
+            <!-- Currency Conversion Summary Notes -->
+            <div id="lcl-currency-notes" class="currency-notes-box" style="display:none; margin-top:20px; padding:16px; background:var(--accent-lighter); border-radius:var(--radius-sm); border:1px solid var(--accent-subtle); font-size:0.82rem; line-height:1.6;">
+              <strong style="color:var(--accent); display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                Bảng quy đổi tiền tệ thực tế trong lô hàng (quy về VND):
+              </strong>
+              <div id="lcl-currency-notes-list" style="color:var(--text-secondary); padding-left:14px; font-weight: 500;"></div>
+            </div>
+
+            <div class="action-bar">
+              <div class="action-bar-left"></div>
+              <div class="action-bar-right" style="display:flex; gap:10px;">
+                <button type="button" class="btn btn-accent btn-lg" id="lcl-contract-btn" style="background:#8b5cf6; border-color:#8b5cf6; color:#fff;">
+                  Tạo Hợp Đồng & PO
+                </button>
+                <button type="button" class="btn btn-primary btn-lg" id="lcl-pdf-btn">
+                  Xuất báo giá PDF
+                </button>
+                <button type="button" class="btn btn-success btn-lg" id="lcl-export-btn">
+                  Xuất file Excel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ -->
+    <!--           TAB 2: FCL               -->
+    <!-- ═══════════════════════════════════ -->
+    <div class="tab-content" id="tab-fcl">
+
+      <!-- FCL Shared Costs -->
+      <div class="section-card animate-in" style="animation-delay: 0.15s">
+        <div class="section-header" style="justify-content: space-between; align-items: center;">
+          <div>
+            <div class="section-title">Chi Phí Chung Toàn Lô (FCL)</div>
+            <div class="section-desc">Phân bổ theo tỷ lệ trị giá hàng hóa — Lưu ý: Cột Thành tiền = chưa VAT</div>
+          </div>
+          <button type="button" id="btn-voice-fcl" class="btn btn-voice" title="Nhập thông số bằng giọng nói">
+            <span class="voice-label">Giọng nói</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div class="shared-cost-grid">
+            <!-- Item 2 -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <div>
+                  <label class="form-label" style="margin-bottom:2px;"><span class="label-tag">2</span> Tổng phí nội địa TQ (không HĐ)</label>
+                  <span class="form-hint">Phí nội địa TQ không có hóa đơn</span>
+                </div>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="fcl-phi-nd-tq" class="form-input" placeholder="0" inputmode="numeric">
+                  <select id="fcl-phi-nd-tq-currency" class="suffix-select">
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+                <input type="text" id="fcl-phi-nd-tq-comment" class="form-input shared-cost-card-comment" placeholder="Ghi chú in báo giá (tùy chọn)...">
+              </div>
+              <div id="fcl-phi-nd-tq-explain" class="calc-explanation" style="display:none;"></div>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <div>
+                  <label class="form-label" style="margin-bottom:2px;"><span class="label-tag">3</span> Tổng phí nội địa VN (không HĐ)</label>
+                  <span class="form-hint">Phí nội địa VN không có hóa đơn</span>
+                </div>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="fcl-phi-nd-vn" class="form-input" placeholder="0" inputmode="numeric">
+                  <select id="fcl-phi-nd-vn-currency" class="suffix-select">
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+                <input type="text" id="fcl-phi-nd-vn-comment" class="form-input shared-cost-card-comment" placeholder="Ghi chú in báo giá (tùy chọn)...">
+              </div>
+              <div id="fcl-phi-nd-vn-explain" class="calc-explanation" style="display:none;"></div>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <div>
+                  <label class="form-label" style="margin-bottom:2px;"><span class="label-tag">4</span> Tổng phí ủy thác</label>
+                </div>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="fcl-phi-ut" class="form-input" placeholder="0" inputmode="numeric">
+                  <select id="fcl-phi-ut-currency" class="suffix-select">
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+                <input type="text" id="fcl-phi-ut-comment" class="form-input shared-cost-card-comment" placeholder="Ghi chú in báo giá (tùy chọn)...">
+              </div>
+              <div id="fcl-phi-ut-explain" class="calc-explanation" style="display:none;"></div>
+            </div>
+
+            <!-- Item 5 -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <div>
+                  <label class="form-label" style="margin-bottom:2px;"><span class="label-tag">5</span> Tổng phí QT có HĐ + phí VC quốc tế</label>
+                  <span class="form-hint">Phí quốc tế có hóa đơn + phí VC quốc tế</span>
+                </div>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="fcl-phi-qt" class="form-input" placeholder="0" inputmode="numeric">
+                  <select id="fcl-phi-qt-currency" class="suffix-select">
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+                <input type="text" id="fcl-phi-qt-comment" class="form-input shared-cost-card-comment" placeholder="Ghi chú in báo giá (tùy chọn)...">
+              </div>
+              <div id="fcl-phi-qt-explain" class="calc-explanation" style="display:none;"></div>
+            </div>
+
+            <!-- Item 6 -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <div>
+                  <label class="form-label" style="margin-bottom:2px;"><span class="label-tag">6</span> Tổng phí VC VN có HĐ (chưa VAT)</label>
+                  <span class="form-hint">Phí vận chuyển Việt Nam có hóa đơn (chưa VAT)</span>
+                </div>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="fcl-phi-vc-vn" class="form-input" placeholder="0" inputmode="numeric">
+                  <select id="fcl-phi-vc-vn-currency" class="suffix-select">
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+                <input type="text" id="fcl-phi-vc-vn-comment" class="form-input shared-cost-card-comment" placeholder="Ghi chú in báo giá (tùy chọn)...">
+              </div>
+              <div id="fcl-phi-vc-vn-explain" class="calc-explanation" style="display:none;"></div>
+            </div>
+
+            <!-- Item: Giá vốn lô hàng (FCL R3) -->
+            <div class="shared-cost-card">
+              <div class="shared-cost-card-header">
+                <label class="form-label" style="margin-bottom:0;">
+                  <span class="label-tag" style="background:#059669;">vốn</span> Giá vốn lô hàng (Cost Price)
+                </label>
+                <label class="switch-container">
+                  <input type="checkbox" id="fcl-override-cost-check" class="switch-input">
+                  <span class="switch-label"></span>
+                  <span>Ghi đè giá gốc</span>
+                </label>
+              </div>
+              <div class="shared-cost-card-inputs">
+                <div class="input-suffix">
+                  <input type="text" id="fcl-manual-cost-input" class="form-input" placeholder="0" inputmode="numeric" disabled>
+                  <span class="suffix">VND</span>
+                </div>
+                <span id="fcl-manual-cost-explain" class="explain-text" style="display:none; font-size:0.75rem; color:var(--text-muted); margin-top:4px;"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bộ cộng dồn chi phí FCL -->
+          <div class="accumulator-box" style="margin-top:20px; padding-top:20px; border-top:1.5px dashed var(--border);">
+            <div style="font-weight:700; font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+              Công Cụ Cộng Dồn & Phân Loại Chi Phí
+            </div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+              <div class="form-group" style="flex:2; min-width:200px;">
+                <div class="form-label" style="font-size:0.75rem; color:var(--text-muted);">Số tiền phát sinh</div>
+                <div class="input-suffix">
+                  <input type="text" id="fcl-acc-amount" class="form-input" placeholder="0" inputmode="numeric" style="padding-right: 75px;">
+                  <select id="fcl-acc-currency" class="suffix-select" style="width: 65px;">
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                    <option value="RMB">RMB</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group" style="flex:2; min-width:180px;">
+                <div class="form-label" style="font-size:0.75rem; color:var(--text-muted);">Giá nền (giá vốn - nếu có)</div>
+                <input type="text" id="fcl-acc-base" class="form-input" placeholder="Để trống = Giá báo" inputmode="numeric">
+              </div>
+
+              <div class="form-group" style="flex:3; min-width:220px;">
+                <div class="form-label" style="font-size:0.75rem; color:var(--text-muted);">Phân loại cộng dồn vào mục</div>
+                <select id="fcl-acc-target" class="form-input" style="cursor:pointer;">
+                  <option value="fcl-phi-nd-tq">(2) Tổng phí nội địa TQ (không HĐ)</option>
+                  <option value="fcl-phi-nd-vn">(3) Tổng phí nội địa VN (không HĐ)</option>
+                  <option value="fcl-phi-ut">(4) Tổng phí ủy thác</option>
+                  <option value="fcl-phi-qt">(5) Tổng phí QT có HĐ + phí VC quốc tế</option>
+                  <option value="fcl-phi-vc-vn">(6) Tổng phí VC VN có HĐ (chưa VAT)</option>
+                </select>
+              </div>
+              <div class="form-group" style="flex:3; min-width:200px;">
+                <div class="form-label" style="font-size:0.75rem; color:var(--text-muted);">Tên phí con / Ghi chú</div>
+                <input type="text" id="fcl-acc-note" class="form-input" placeholder="Ví dụ: Phí nâng hạ, THC...">
+              </div>
+              <button type="button" class="btn btn-primary" id="fcl-acc-btn" style="padding:10px 20px;">
+                ＋ Cộng dồn vào
+              </button>
+            </div>
+            <!-- Sub-fees list preview on web -->
+            <div id="fcl-acc-list-container" style="margin-top:14px; display:none;">
+              <div style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">Danh sách phí con đã cộng dồn:</div>
+              <div id="fcl-acc-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FCL Items -->
+      <div class="section-card animate-in" style="animation-delay: 0.2s">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Danh Sách Mặt Hàng</div>
+            <div class="section-desc">Nhập thông tin từng mặt hàng — thuế suất riêng cho từng loại</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="items-container">
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th style="width:50px">#</th>
+                  <th>Tên mặt hàng</th>
+                  <th style="width:80px">Số lượng</th>
+                  <th style="width:200px">Giá trị hàng</th>
+                  <th style="width:85px">% Thuế NK</th>
+                  <th style="width:85px">% Thuế khác</th>
+                  <th style="width:75px">% VAT</th>
+                  <th style="width:50px"></th>
+                </tr>
+              </thead>
+              <tbody id="fcl-items-body">
+                <tr data-index="1">
+                  <td><div class="row-number">1</div></td>
+                  <td><input type="text" class="item-input name-input" placeholder="Tên mặt hàng" data-field="name"></td>
+                  <td><input type="text" class="item-input small" placeholder="0" data-field="qty" inputmode="numeric"></td>
+                  <td>
+                    <div style="display:flex; gap:4px; align-items:center;">
+                      <input type="text" class="item-input" placeholder="0" data-field="value" inputmode="numeric" style="flex:1; min-width:80px;">
+                      <select class="item-input currency-select" data-field="currency" style="width:65px; padding:2px 4px; font-size:0.8rem; cursor:pointer;">
+                        <option value="VND">VND</option>
+                        <option value="USD">USD</option>
+                        <option value="RMB">RMB</option>
+                      </select>
+                    </div>
+                  </td>
+                  <td><input type="text" class="item-input small" placeholder="0" data-field="taxNK" data-type="percent" inputmode="decimal"></td>
+                  <td><input type="text" class="item-input small" placeholder="0" data-field="taxOther" data-type="percent" inputmode="decimal"></td>
+                  <td><input type="text" class="item-input small" value="8" data-field="vat" data-type="percent" inputmode="decimal"></td>
+                  <td><button type="button" class="btn btn-danger btn-icon remove-item-btn" title="Xóa">X</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="action-bar">
+            <div class="action-bar-left">
+              <button type="button" class="btn btn-secondary" id="fcl-add-item">
+                Thêm mặt hàng
+              </button>
+              <button type="button" class="btn btn-secondary" id="fcl-import-btn">
+                Nhập từ Excel
+              </button>
+              <button type="button" class="btn btn-secondary" id="fcl-template-btn">
+                Tải mẫu Excel
+              </button>
+              <input type="file" id="fcl-file-input" accept=".xlsx, .xls, .csv" style="display:none;">
+            </div>
+            <div class="action-bar-right">
+              <button type="button" class="btn btn-primary btn-lg" id="fcl-calc-btn">
+                Tính toán phân bổ
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FCL Results -->
+      <div class="results-section" id="fcl-results">
+        <div class="section-card">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Kết Quả Ước Tính 1 Sổ — FCL Nguyên Cont</div>
+              <div class="section-desc">Phân bổ theo trị giá hàng hóa (C2) • Đơn vị: VND</div>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="results-wrapper">
+              <table class="results-table">
+                <thead>
+                  <tr>
+                    <th>Mặt hàng</th>
+                    <th>SL</th>
+                    <th>Tỷ lệ PB</th>
+                    <th>(1) Giá trị hàng</th>
+                    <th>(2) Phí NĐ TQ</th>
+                    <th>(3) Phí NĐ VN</th>
+                    <th>(4) Phí UT</th>
+                    <th>(5) Phí QT</th>
+                    <th>(6) Phí VC VN</th>
+                    <th>(7) Giá EXW</th>
+                    <th>(8) Giá CIF</th>
+                    <th>(9) NK%</th>
+                    <th>(10) Khác%</th>
+                    <th>(11) VAT%</th>
+                    <th>(12) Thuế TT</th>
+                    <th>(13) VAT</th>
+                    <th>(14) Tổng CP+TT</th>
+                    <th>(15) Giá XHĐ</th>
+                    <th>(16) Chuyển thêm</th>
+                    <th>ĐG EXW (USD)</th>
+                    <th>ĐG HĐ (VND)</th>
+                  </tr>
+                </thead>
+                <tbody id="fcl-results-body"></tbody>
+              </table>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+              <div class="summary-card">
+                <div class="sc-label">Tổng giá trị hàng</div>
+                <div class="sc-value" id="fcl-sum-total-value">0 ₫</div>
+              </div>
+              <div class="summary-card">
+                <div class="sc-label">Tổng giá EXW</div>
+                <div class="sc-value" id="fcl-sum-exw">0 ₫</div>
+              </div>
+              <div class="summary-card">
+                <div class="sc-label">Tổng giá CIF</div>
+                <div class="sc-value" id="fcl-sum-cif">0 ₫</div>
+              </div>
+              <div class="summary-card accent">
+                <div class="sc-label">Giá trị xuất HĐ (đã VAT)</div>
+                <div class="sc-value" id="fcl-sum-invoice">0 ₫</div>
+              </div>
+              <div class="summary-card">
+                <div class="sc-label">Số tiền chuyển thêm</div>
+                <div class="sc-value" id="fcl-sum-extra">0 ₫</div>
+              </div>
+              <div class="summary-card cost-card">
+                <div class="sc-label">Giá vốn lô hàng</div>
+                <div class="sc-value" id="fcl-sum-cost-price">0 ₫</div>
+                <div class="sc-subtext" id="fcl-sum-cost-type" style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">Tự động từ hệ thống</div>
+              </div>
+              <div class="summary-card profit-card">
+                <div class="sc-label">
+                  <span>Lợi nhuận dự kiến</span>
+                  <span class="profit-badge" id="fcl-sum-profit-margin">0.00%</span>
+                </div>
+                <div class="sc-value" id="fcl-sum-expected-profit">0 ₫</div>
+              </div>
+            </div>
+
+            <!-- Currency Conversion Summary Notes -->
+            <div id="fcl-currency-notes" class="currency-notes-box" style="display:none; margin-top:20px; padding:16px; background:var(--accent-lighter); border-radius:var(--radius-sm); border:1px solid var(--accent-subtle); font-size:0.82rem; line-height:1.6;">
+              <strong style="color:var(--accent); display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                Bảng quy đổi tiền tệ thực tế trong lô hàng (quy về VND):
+              </strong>
+              <div id="fcl-currency-notes-list" style="color:var(--text-secondary); padding-left:14px; font-weight: 500;"></div>
+            </div>
+
+            <div class="action-bar">
+              <div class="action-bar-left"></div>
+              <div class="action-bar-right" style="display:flex; gap:10px;">
+                <button type="button" class="btn btn-accent btn-lg" id="fcl-contract-btn" style="background:#8b5cf6; border-color:#8b5cf6; color:#fff;">
+                  Tạo Hợp Đồng & PO
+                </button>
+                <button type="button" class="btn btn-primary btn-lg" id="fcl-pdf-btn">
+                  Xuất báo giá PDF
+                </button>
+                <button type="button" class="btn btn-success btn-lg" id="fcl-export-btn">
+                  Xuất file Excel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ -->
+    <!--           TAB 3: ADMIN             -->
+    <!-- ═══════════════════════════════════ -->
+    <div class="tab-content" id="tab-admin">
+      <!-- Admin Inner Sub-Navigation -->
+      <div class="admin-subnav">
+        <button type="button" class="admin-subtab-btn active" data-subtab="admin-sub-tariff">Bảng Phí & Tham Số</button>
+        <button type="button" class="admin-subtab-btn" data-subtab="admin-sub-auth">Tài Khoản & Log IP</button>
+        <button type="button" class="admin-subtab-btn" data-subtab="admin-sub-tools">Quản Lý Công Cụ</button>
+        <button type="button" class="admin-subtab-btn" data-subtab="admin-sub-pwa">Cài Đặt PWA & Push</button>
+        <button type="button" class="admin-subtab-btn" data-subtab="admin-sub-contract">Quản Lý Mẫu HĐ & PO</button>
+      </div>
+
+      <!-- Subtab 1: Configuration & Tariffs -->
+      <div class="admin-subcontent active" id="admin-sub-tariff">
+        <div class="admin-grid-2">
+          
+          <!-- Parameters configuration card -->
+          <div class="section-card">
+            <div class="section-header">
+              <div>
+                <div class="section-title">Tham Số Phí Ủy Thác & Rủi Ro LCL</div>
+                <div class="section-desc">Cấu hình các mốc tính phí và tỷ lệ phần trăm</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="form-group">
+                  <label class="form-label">Phí ủy thác cố định (nền)</label>
+                  <div class="input-suffix">
+                    <input type="text" id="cfg-phi-ut-base" class="form-input" placeholder="400.000" inputmode="numeric">
+                    <span class="suffix">₫/mục</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Mốc hàng giá trị cao</label>
+                  <div class="input-suffix">
+                    <input type="text" id="cfg-risk-threshold" class="form-input" placeholder="100.000.000" inputmode="numeric">
+                    <span class="suffix">₫/khối</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tỷ lệ phí quản trị rủi ro</label>
+                  <div class="input-suffix">
+                    <input type="text" id="cfg-risk-rate" class="form-input" placeholder="1" inputmode="decimal">
+                    <span class="suffix">%</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Đơn giá cước QT QC (Biển)</label>
+                  <div class="input-suffix">
+                    <input type="text" id="cfg-phi-vc-tq-qc" class="form-input" placeholder="1.000.000" inputmode="numeric">
+                    <span class="suffix">₫/m³</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Đơn giá cước QT BT (Bộ)</label>
+                  <div class="input-suffix">
+                    <input type="text" id="cfg-phi-vc-tq-bt" class="form-input" placeholder="700.000" inputmode="numeric">
+                    <span class="suffix">₫/m³</span>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top:20px; display:flex; gap:12px;">
+                <button type="button" class="btn btn-primary" id="save-tariffs-btn">Lưu bảng phí & Cấu hình</button>
+                <button type="button" class="btn btn-secondary" id="reset-tariffs-btn">Reset mặc định</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bảng VIP (M3 & KG) -->
+          <div class="section-card">
+            <div class="section-header">
+              <div>
+                <div class="section-title">BẢNG PHÍ CỐ ĐỊNH THEO VIP</div>
+                <div class="section-desc">Giá cố định không đổi theo mốc đơn hàng</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="config-table-wrapper">
+                <table class="config-table" id="table-vip-rates">
+                  <thead>
+                     <tr>
+                       <th>Tuyến & Loại</th>
+                       <th style="width:20%">Basic (₫)</th>
+                       <th style="width:20%">Pro (-10%) (₫)</th>
+                       <th style="width:20%">Premium (-20%) (₫)</th>
+                       <th style="width:20%">Elite (-30%) (₫)</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <!-- Load dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bảng Linh hoạt Hàng nhẹ (M3) -->
+          <div class="section-card" style="grid-column: 1 / -1;">
+            <div class="section-header">
+              <div>
+                <div class="section-title">BẢNG PHÍ LINH HOẠT ĐỐI VỚI HÀNG NHẸ (TÍNH THEO KHỐI - M3)</div>
+                <div class="section-desc">Đơn giá VND/m³ tự động áp dụng theo thể tích lô hàng</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="config-table-wrapper">
+                <table class="config-table" id="table-flexible-m3-rates">
+                  <thead>
+                     <tr>
+                       <th>Tuyến</th>
+                       <th>Dưới 1m³</th>
+                       <th>1m³ - &lt;2m³</th>
+                       <th>2m³ - &lt;5m³</th>
+                       <th>5m³ - &lt;10m³</th>
+                       <th>10m³ - &lt;20m³</th>
+                       <th>20m³ - &lt;30m³</th>
+                       <th>&gt;= 30m³</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <!-- Load dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bảng Linh hoạt Hàng nặng (KG) -->
+          <div class="section-card" style="grid-column: 1 / -1;">
+            <div class="section-header">
+              <div>
+                <div class="section-title">BẢNG PHÍ LINH HOẠT ĐỐI VỚI HÀNG NẶNG (TÍNH THEO CÂN - KG)</div>
+                <div class="section-desc">Đơn giá VND/kg tự động áp dụng theo trọng lượng lô hàng</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="config-table-wrapper">
+                <table class="config-table" id="table-flexible-kg-rates">
+                  <thead>
+                     <tr>
+                       <th>Tuyến</th>
+                       <th>Dưới 300kg</th>
+                       <th>300kg - &lt;500kg</th>
+                       <th>500kg - &lt;1.5 Tấn</th>
+                       <th>1.5 Tấn - &lt;5 Tấn</th>
+                       <th>5 Tấn - &lt;10 Tấn</th>
+                       <th>&gt;= 10 Tấn</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <!-- Load dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Subtab 2: Accounts & Log IP (same as old grid) -->
+      <div class="admin-subcontent" id="admin-sub-auth">
+        <div class="admin-grid-2">
+          <!-- Account Management Card -->
+          <div class="section-card animate-in" style="animation-delay: 0.15s">
+            <div class="section-header">
+              <div>
+                <div class="section-title">Quản Lý Tài Khoản Đăng Nhập</div>
+                <div class="section-desc">Tạo và phân quyền các tài khoản sử dụng công cụ</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <form id="create-user-form" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px; padding-bottom:20px; border-bottom:1.5px dashed var(--border);">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                  <div class="form-group">
+                    <label class="form-label">Tên đăng nhập</label>
+                    <input type="text" id="new-username" class="form-input" required placeholder="Ví dụ: sales1">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Tên hiển thị</label>
+                    <input type="text" id="new-displayname" class="form-input" required placeholder="Ví dụ: Nguyễn Văn A">
+                  </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                  <div class="form-group">
+                    <label class="form-label">Mật khẩu</label>
+                    <input type="password" id="new-password" class="form-input" required placeholder="••••••••">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Vai trò</label>
+                    <select id="new-role" class="form-input" style="cursor:pointer;">
+                      <option value="user">Nhân viên Sales (User)</option>
+                      <option value="admin">Quản trị viên (Admin)</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="align-self:flex-start;">Tạo tài khoản</button>
+              </form>
+
+              <div class="items-container">
+                <table class="items-table" style="min-width:auto;">
+                  <thead>
+                    <tr>
+                      <th>Tên đăng nhập</th>
+                      <th>Tên hiển thị</th>
+                      <th>Vai trò</th>
+                      <th>Mật khẩu</th>
+                      <th>Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody id="user-list-body">
+                    <!-- Tài khoản load động ở đây -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- IP Access Logs Card -->
+          <div class="section-card animate-in" style="animation-delay: 0.2s">
+            <div class="section-header">
+              <div>
+                <div class="section-title">Nhật Ký Truy Cập IP</div>
+                <div class="section-desc">Theo dõi các lượt đăng nhập và địa chỉ IP truy cập hệ thống</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <span class="section-desc" id="ip-log-count">0 lượt truy cập được ghi nhận</span>
+                <button type="button" class="btn btn-danger" id="clear-ip-logs-btn" style="padding:4px 8px; font-size:0.75rem;">Clear logs</button>
+              </div>
+              <div class="items-container" style="max-height: 400px; overflow-y: auto;">
+                <table class="items-table" style="min-width:auto; font-size:0.8rem;">
+                  <thead>
+                    <tr>
+                      <th>Thời gian</th>
+                      <th>Tài khoản</th>
+                      <th>IP</th>
+                      <th>Vị trí / Thiết bị</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ip-log-body">
+                    <!-- Load động log ở đây -->
+                  </tbody>
+                </table>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      <!-- Subtab 3: Manage Support Tools -->
+      <div class="admin-subcontent" id="admin-sub-tools">
+        <div class="admin-grid-2" style="grid-template-columns: 1fr 1fr; gap:20px;">
+          <!-- Add Tool Form Card -->
+          <div class="section-card animate-in" style="animation-delay: 0.1s">
+            <div class="section-header">
+              <div>
+                <div class="section-title">Thêm Công Cụ Hỗ Trợ Mới</div>
+                <div class="section-desc">Cấu hình liên kết tiện ích hữu ích cho nhân viên kinh doanh</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <form id="create-tool-form" style="display:flex; flex-direction:column; gap:12px;">
+                <div class="form-group">
+                  <label class="form-label">Tên công cụ</label>
+                  <input type="text" id="new-tool-name" class="form-input" required placeholder="Ví dụ: Tra cứu hải quan...">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Đường dẫn liên kết (URL)</label>
+                  <input type="url" id="new-tool-url" class="form-input" required placeholder="https://example.com...">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Mô tả ngắn gọn (Không bắt buộc)</label>
+                  <input type="text" id="new-tool-desc" class="form-input" placeholder="Ví dụ: Dùng để tra mã HS, biểu thuế...">
+                </div>
+                <button type="submit" class="btn btn-primary" style="align-self:flex-start;">Thêm liên kết</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Existing Tools List Card -->
+          <div class="section-card animate-in" style="animation-delay: 0.15s">
+            <div class="section-header">
+              <div>
+                <div class="section-title">Danh Sách Liên Kết Hiện Có</div>
+                <div class="section-desc">Danh sách các công cụ hỗ trợ đang hiển thị ngoài trang chủ</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="items-container">
+                <table class="items-table" style="min-width:auto;">
+                  <thead>
+                    <tr>
+                      <th>Tên Công Cụ</th>
+                      <th>Đường Dẫn Link</th>
+                      <th style="width: 80px; text-align:center;">Thao Tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-tools-tbody">
+                    <!-- Loaded dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtab 4: PWA & Push Notifications -->
+      <div class="admin-subcontent" id="admin-sub-pwa">
+        <div class="admin-grid-2">
+          <!-- PWA Installation Info Card -->
+          <div class="section-card">
+            <div class="section-header">
+              <div>
+                <div class="section-title">Cài Đặt Ứng Dụng (PWA)</div>
+                <div class="section-desc">Hướng dẫn và công cụ cài đặt ứng dụng như Mini-App độc lập</div>
+              </div>
+            </div>
+            <div class="section-body" style="display:flex; flex-direction:column; gap:16px;">
+              <p style="font-size:0.85rem; color:var(--text-secondary);">
+                Hệ thống hỗ trợ cài đặt phím tắt ứng dụng trực tiếp lên màn hình chính của bạn, khởi chạy toàn màn hình như một ứng dụng gốc không có thanh công cụ trình duyệt.
+              </p>
+              <div id="pwa-install-container" style="display:none;">
+                <button type="button" class="btn btn-primary" id="pwa-install-btn" style="width:100%;">
+                  Cài đặt ứng dụng
+                </button>
+              </div>
+              <div id="pwa-installed-status" style="padding:10px 14px; background:var(--success-bg); color:var(--success); font-size:0.82rem; font-weight:700; border-radius:var(--radius-sm); border:1px solid rgba(46,204,113,0.3); text-align:center;">
+                Ứng dụng đã được cài đặt hoặc đang chạy dưới dạng Standalone
+              </div>
+              <div style="font-size:0.8rem; border-top:1px solid var(--border-light); padding-top:12px;">
+                <strong>Hướng dẫn iOS (Safari iPhone/iPad):</strong>
+                <ol style="margin-left:20px; margin-top:6px; line-height:1.5; color:var(--text-secondary);">
+                  <li>Chạm vào biểu tượng <strong>Chia sẻ (Share)</strong> ở thanh dưới cùng trình duyệt.</li>
+                  <li>Chọn <strong>"Thêm vào MH chính" (Add to Home Screen)</strong>.</li>
+                  <li>Nhấn <strong>Thêm (Add)</strong> ở góc trên bên phải.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+          <!-- Push Notifications Card -->
+          <div class="section-card">
+            <div class="section-header">
+              <div>
+                <div class="section-title">Cấu Hình Thông Báo (Push Notification)</div>
+                <div class="section-desc">Quản lý cấp quyền nhận thông báo và gửi thử nghiệm</div>
+              </div>
+            </div>
+            <div class="section-body" style="display:flex; flex-direction:column; gap:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="form-label" style="margin-bottom:0;">Quyền nhận thông báo đẩy:</span>
+                <span id="push-permission-status" class="history-badge" style="padding:4px 10px; font-size:0.75rem; font-weight:700;">Chưa cấp quyền</span>
+              </div>
+              
+              <button type="button" class="btn btn-secondary" id="push-request-btn" style="width:100%;">
+                Đăng ký / Bật thông báo
+              </button>
+
+              <div style="border-top:1px solid var(--border-light); padding-top:14px; display:flex; flex-direction:column; gap:12px;">
+                <div class="section-title" style="font-size:0.88rem;">Gửi thông báo đẩy thử nghiệm (Local Test)</div>
+                
+                <div class="form-group">
+                  <label class="form-label">Tiêu đề thông báo</label>
+                  <input type="text" id="push-test-title" class="form-input" value="Eureka Logistics" placeholder="Tiêu đề...">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nội dung thông báo</label>
+                  <input type="text" id="push-test-body" class="form-input" value="Chào mừng trở lại! Bạn có thông báo mới." placeholder="Nội dung...">
+                </div>
+                
+                <button type="button" class="btn btn-success" id="push-send-test-btn" style="width:100%;">
+                  Gửi thông báo đẩy thử nghiệm
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtab 5: Contract & PO Templates -->
+      <div class="admin-subcontent" id="admin-sub-contract">
+        <div class="admin-grid-2" style="grid-template-columns: 1fr 1.5fr; gap:20px;">
+          <!-- Seller Info Card -->
+          <div class="section-card">
+            <div class="section-header">
+              <div>
+                <div class="section-title">Thông Tin Bên Bán Mặc Định (Bên A)</div>
+                <div class="section-desc">Cấu hình thông tin pháp lý của đơn vị nhận ủy thác/bán hàng</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <form id="seller-info-form" style="display:flex; flex-direction:column; gap:12px;">
+                <div class="form-group">
+                  <label class="form-label">Tên Doanh Nghiệp (Bên A)</label>
+                  <input type="text" id="cfg-seller-name" class="form-input" required placeholder="Ví dụ: CÔNG TY CỔ PHẦN EUREKA LOGISTICS">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Địa Chỉ Trụ Sở</label>
+                  <input type="text" id="cfg-seller-addr" class="form-input" required placeholder="Số 123 Đường Láng, Đống Đa, Hà Nội">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Địa Chỉ Văn Phòng Giao Dịch</label>
+                  <input type="text" id="cfg-seller-office" class="form-input" required placeholder="Tầng 3, Tòa PCC1, số 44 đường Triều Khúc, Hà Nội">
+                </div>
+                <div class="form-group" style="display:grid; grid-template-columns:1fr 1.2fr; gap:12px;">
+                  <div>
+                    <label class="form-label">Điện Thoại</label>
+                    <input type="text" id="cfg-seller-phone" class="form-input" required placeholder="0898586633">
+                  </div>
+                  <div>
+                    <label class="form-label">Mã Số Thuế</label>
+                    <input type="text" id="cfg-seller-tax" class="form-input" required placeholder="0107792615">
+                  </div>
+                </div>
+                <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                  <div>
+                    <label class="form-label">Người Đại Diện</label>
+                    <input type="text" id="cfg-seller-rep" class="form-input" required placeholder="Nguyễn Văn A">
+                  </div>
+                  <div>
+                    <label class="form-label">Chức Vụ</label>
+                    <input type="text" id="cfg-seller-position" class="form-input" required placeholder="Giám đốc">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Số Tài Khoản Ngân Hàng</label>
+                  <input type="text" id="cfg-seller-bank" class="form-input" required placeholder="190203040506">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tên Ngân Hàng</label>
+                  <input type="text" id="cfg-seller-bank-name" class="form-input" required placeholder="Techcombank - Chi nhánh Hà Nội">
+                </div>
+                <button type="submit" class="btn btn-primary" style="align-self:flex-start; margin-top:8px;">Lưu Thông Tin Bên A</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Templates Editor Card -->
+          <div class="section-card">
+            <div class="section-header">
+              <div>
+                <div class="section-title">Soạn Thảo Biểu Mẫu Hợp Đồng & PO</div>
+                <div class="section-desc">Chỉnh sửa mẫu hợp đồng (chấp nhận định dạng HTML để giữ cấu trúc văn bản)</div>
+              </div>
+            </div>
+            <div class="section-body" style="display:flex; flex-direction:column; gap:16px;">
+              <div class="form-group">
+                <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                  <span>Mẫu 1: Hợp Đồng Nguyên Tắc (Principal Contract)</span>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-contract-nt-tpl" style="padding:2px 8px; font-size:0.75rem;">Reset Mẫu 1</button>
+                </label>
+                <textarea id="cfg-contract-nt-template" class="form-input" style="font-family:monospace; font-size:0.8rem; height:180px; line-height:1.4; white-space:pre-wrap; resize:vertical;"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                  <span>Mẫu 2: Đơn Đặt Hàng (Purchase Order)</span>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-po-tpl" style="padding:2px 8px; font-size:0.75rem;">Reset Mẫu 2</button>
+                </label>
+                <textarea id="cfg-po-template" class="form-input" style="font-family:monospace; font-size:0.8rem; height:150px; line-height:1.4; white-space:pre-wrap; resize:vertical;"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                  <span>Mẫu 3: Hợp Đồng Mua Bán Hàng Hóa (Sales Contract)</span>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-contract-mb-tpl" style="padding:2px 8px; font-size:0.75rem;">Reset Mẫu 3</button>
+                </label>
+                <textarea id="cfg-contract-mb-template" class="form-input" style="font-family:monospace; font-size:0.8rem; height:180px; line-height:1.4; white-space:pre-wrap; resize:vertical;"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                  <span>Mẫu 4: Phụ Lục Điều Chỉnh Hợp Đồng (Contract Appendix)</span>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-appendix-contract-tpl" style="padding:2px 8px; font-size:0.75rem;">Reset Mẫu 4</button>
+                </label>
+                <textarea id="cfg-appendix-contract-template" class="form-input" style="font-family:monospace; font-size:0.8rem; height:180px; line-height:1.4; white-space:pre-wrap; resize:vertical;"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                  <span>Mẫu 5: Phụ Lục Điều Chỉnh Đơn Đặt Hàng (PO Appendix)</span>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-appendix-po-tpl" style="padding:2px 8px; font-size:0.75rem;">Reset Mẫu 5</button>
+                </label>
+                <textarea id="cfg-appendix-po-template" class="form-input" style="font-family:monospace; font-size:0.8rem; height:180px; line-height:1.4; white-space:pre-wrap; resize:vertical;"></textarea>
+              </div>
+
+              <div class="help-box" style="background:var(--bg-card-alt); border:1px solid var(--border); padding:12px; border-radius:var(--radius-sm); font-size:0.78rem; line-height:1.5;">
+                <strong style="color:var(--accent);">Các Thẻ Thay Thế Tự Động (Placeholders):</strong>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px; font-family:monospace; color:var(--text-secondary);">
+                  <div>{SO_HD} : Số Hợp Đồng (HĐNT / HĐMB)</div>
+                  <div>{SO_PO} : Số PO / Đơn đặt hàng</div>
+                  <div>{NGAY_KY} : Ngày Ký / Ngày tạo</div>
+                  <div>{SELLER_NAME} : Tên Bên Bán (Bên A)</div>
+                  <div>{SELLER_ADDR} : Trụ sở chính Bên A</div>
+                  <div>{SELLER_OFFICE} : VP Giao dịch Bên A</div>
+                  <div>{SELLER_PHONE} : Điện thoại Bên A</div>
+                  <div>{SELLER_TAX} : MST Bên A</div>
+                  <div>{SELLER_BANK} : Số tài khoản Bên A</div>
+                  <div>{SELLER_BANK_NAME} : Ngân hàng Bên A</div>
+                  <div>{SELLER_REP} : Đại Diện Bên A</div>
+                  <div>{SELLER_POSITION} : Chức vụ Bên A</div>
+                  <div>{BUYER_NAME} : Tên Bên Mua (Bên B)</div>
+                  <div>{BUYER_ADDR} : Địa Chỉ Bên B / Nơi giao hàng</div>
+                  <div>{BUYER_PHONE} : Điện thoại Bên B</div>
+                  <div>{BUYER_TAX} : MST Bên B</div>
+                  <div>{BUYER_REP} : Đại Diện Bên B</div>
+                  <div>{BUYER_POSITION} : Chức vụ Bên B</div>
+                  <div>{BUYER_EMAIL} : Email Bên B</div>
+                  <div>{ITEMS_TABLE} : Bảng Danh Sách Hàng Hóa</div>
+                  <div>{TOTAL_AMOUNT_VND} : Tổng Tiền VND (có VAT)</div>
+                  <div>{TOTAL_AMOUNT_WORDS_VND} : Tổng Tiền Bằng Chữ</div>
+                  <div>{EXCHANGE_RATE_USD} : Tỷ Giá USD</div>
+                  <div>{EXCHANGE_RATE_RMB} : Tỷ Giá RMB</div>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-primary btn-lg" id="btn-save-templates" style="width:100%;">Lưu Cấu Hình Mẫu HĐ & PO</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ -->
+    <!--          TAB 4: HISTORY            -->
+    <!-- ═══════════════════════════════════ -->
+    <div class="tab-content" id="tab-history">
+      <div class="section-card animate-in" style="animation-delay: 0.15s">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Lịch Sử Tính Toán (Chi tiết)</div>
+            <div class="section-desc">Danh sách đầy đủ các lô hàng đã báo giá trong 10 ngày gần nhất</div>
+          </div>
+        </div>
+        <div class="section-body" style="padding:20px;">
+          <div id="history-detail-list" class="history-detail-list">
+            <!-- Render động history detail cards -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ -->
+    <!--          TAB 5: SUPPORT            -->
+    <!-- ═══════════════════════════════════ -->
+    <div class="tab-content" id="tab-support">
+      <div class="section-card animate-in" style="animation-delay: 0.15s">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Công Cụ Hỗ Trợ & Tra Cứu</div>
+            <div class="section-desc">Danh sách liên kết tiện ích hữu ích cho nhân viên logistics (Click để mở liên kết trong tab mới)</div>
+          </div>
+        </div>
+        <div class="section-body" style="padding:20px;">
+          <div id="support-tools-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+            <!-- Rendered dynamically -->
+          </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- ═══════════════════════════════════ -->
+    <!--          TAB 6: ABOUT              -->
+    <!-- ═══════════════════════════════════ -->
+    <div class="tab-content" id="tab-about">
+      <div class="section-card animate-in" style="animation-delay: 0.15s">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Giới Thiệu Chức Năng & Hướng Dẫn Sử Dụng</div>
+            <div class="section-desc">Cẩm nang hướng dẫn sử dụng Hệ thống ước tính chi phí và phân bổ giá khai báo 1 sổ</div>
+          </div>
+        </div>
+        <div class="section-body" style="padding:24px; line-height:1.7; color:var(--text); font-size:0.95rem;">
+          
+          <div style="margin-bottom:32px;">
+            <h3 style="color:var(--primary); border-bottom:1.5px solid var(--border-light); padding-bottom:8px; margin-bottom:12px; font-size:1.15rem; font-weight:600;">1. Tính toán & Phân bổ Hàng LCL (Gom Cont)</h3>
+            <p><strong>Chức năng:</strong> Hỗ trợ nhập và tính toán phân bổ toàn bộ chi phí chung của lô hàng lẻ (LCL) như cước vận chuyển, phí ủy thác, phí rủi ro, phí khác tại TQ và VN vào giá trị của từng mặt hàng dựa trên tỷ lệ trị giá hàng hóa.</p>
+            <p><strong>Hướng dẫn sử dụng:</strong></p>
+            <ul style="padding-left:20px; margin-bottom:16px;">
+              <li>Nhập các thông số chung của lô hàng (Tuyến đường, Khối lượng CBM, Trọng lượng KG, Hạng VIP, Tỷ giá).</li>
+              <li>Điền các chi phí chung của lô hàng (hoặc sử dụng <strong>Công cụ cộng dồn</strong> ở dưới để cộng gộp nhiều chi phí nhỏ lẻ).</li>
+              <li>Khai báo danh sách mặt hàng (Tên, Số lượng, Trị giá, Thuế suất NK, Thuế suất Khác, Thuế suất VAT) hoặc bấm <strong>Nhập từ Excel</strong> bằng file mẫu tải về từ hệ thống.</li>
+              <li>Bấm <strong>Tính toán phân bổ</strong> để hệ thống tự động chia phí và thuế trực tiếp cho từng dòng hàng.</li>
+              <li>Xem kết quả phân bổ chi tiết ở bảng dưới cùng và nhấn <strong>Xuất báo giá PDF</strong> hoặc <strong>Xuất file Excel</strong> để gửi khách hàng.</li>
+            </ul>
+            <img src="img_lcl.png" alt="Màn hình LCL" style="display:block; max-width:100%; border:1.5px solid var(--border-light); border-radius:8px; margin-top:12px; box-shadow:var(--shadow-sm);">
+          </div>
+
+          <div style="margin-bottom:32px;">
+            <h3 style="color:var(--primary); border-bottom:1.5px solid var(--border-light); padding-bottom:8px; margin-bottom:12px; font-size:1.15rem; font-weight:600;">2. Tính toán & Phân bổ Hàng FCL (Nguyên Cont)</h3>
+            <p><strong>Chức năng:</strong> Tương tự như LCL, nhưng cấu hình các mục chi phí phù hợp với đặc thù vận chuyển nguyên cont (FCL) như phí nội địa Trung Quốc, phí nội địa Việt Nam, phí ủy thác, cước biển/phí quốc tế và phí vận chuyển nội địa Việt Nam có hóa đơn đỏ.</p>
+            <p><strong>Hướng dẫn sử dụng:</strong></p>
+            <ul style="padding-left:20px; margin-bottom:16px;">
+              <li>Nhập tỷ giá USD/VND và RMB/VND tương ứng.</li>
+              <li>Điền chi tiết các chi phí chung cho cả cont ở khung "Chi Phí Chung Toàn Lô (FCL)".</li>
+              <li>Nhập danh sách các mặt hàng trong cont (hoặc tải file Excel lên).</li>
+              <li>Nhấn <strong>Tính toán phân bổ</strong> và kiểm tra bảng phân bổ chi tiết phía dưới.</li>
+              <li>Nhấn <strong>Xuất báo giá PDF</strong> hoặc <strong>Xuất file Excel</strong> để hoàn tất.</li>
+            </ul>
+            <img src="img_fcl.png" alt="Màn hình FCL" style="display:block; max-width:100%; border:1.5px solid var(--border-light); border-radius:8px; margin-top:12px; box-shadow:var(--shadow-sm);">
+          </div>
+
+          <div style="margin-bottom:32px;">
+            <h3 style="color:var(--primary); border-bottom:1.5px solid var(--border-light); padding-bottom:8px; margin-bottom:12px; font-size:1.15rem; font-weight:600;">3. Lịch Sử Tính Toán</h3>
+            <p><strong>Chức năng:</strong> Lưu trữ tự động toàn bộ lịch sử các lô hàng đã thực hiện tính toán phân bổ thành công trong vòng 10 ngày gần nhất để xem lại và khôi phục khi cần thiết.</p>
+            <p><strong>Hướng dẫn sử dụng:</strong></p>
+            <ul style="padding-left:20px; margin-bottom:16px;">
+              <li>Mỗi khi bấm "Tính toán phân bổ" ở tab LCL/FCL, hệ thống sẽ tự động lưu lại phiên bản đó vào lịch sử thiết bị.</li>
+              <li>Bấm vào tab <strong>Lịch Sử Tính Toán</strong>, các phiên tính toán sẽ được sắp xếp tự động từ <strong>mới nhất đến cũ nhất</strong>.</li>
+              <li>Nhấp vào nút <strong>Xem lại & Khôi phục</strong> trên thẻ lịch sử tương ứng để tải lại toàn bộ thông tin chi phí và danh sách mặt hàng của lô hàng đó lên màn hình chính.</li>
+            </ul>
+            <img src="img_history.png" alt="Màn hình Lịch sử" style="display:block; max-width:100%; border:1.5px solid var(--border-light); border-radius:8px; margin-top:12px; box-shadow:var(--shadow-sm);">
+          </div>
+
+          <div style="margin-bottom:10px;">
+            <h3 style="color:var(--primary); border-bottom:1.5px solid var(--border-light); padding-bottom:8px; margin-bottom:12px; font-size:1.15rem; font-weight:600;">4. Công Cụ Hỗ Trợ & Quản Trị Hệ Thống</h3>
+            <p><strong>Chức năng:</strong> Nơi hiển thị các liên kết hỗ trợ tra cứu HS code, biểu thuế, lịch tàu do Admin cấu hình. Admin có thể thay đổi bảng giá cước, thêm tài khoản và quản trị danh mục liên kết.</p>
+            <p><strong>Hướng dẫn sử dụng:</strong></p>
+            <ul style="padding-left:20px; margin-bottom:16px;">
+              <li>Nhấp vào tab <strong>Công Cụ Hỗ Trợ</strong> để truy cập nhanh các liên kết nghiệp vụ hữu ích (luôn mở ở cửa sổ mới).</li>
+              <li>Đối với quản trị viên (Admin): Bấm vào nút <strong>Quản Trị</strong> ở góc trên bên phải để vào trang cấu hình bảng giá, tạo tài khoản sales hoặc thêm/xóa các liên kết hỗ trợ trong mục <strong>Quản Lý Công Cụ</strong>.</li>
+            </ul>
+            <img src="img_support.png" alt="Màn hình Công cụ hỗ trợ" style="display:block; max-width:100%; border:1.5px solid var(--border-light); border-radius:8px; margin-top:12px; box-shadow:var(--shadow-sm);">
+          </div>
+
+          <div style="margin-top:32px; margin-bottom:10px;">
+            <h3 style="color:var(--primary); border-bottom:1.5px solid var(--border-light); padding-bottom:8px; margin-bottom:12px; font-size:1.15rem; font-weight:600;">5. Cấu trúc File Báo Giá PDF Xuất Bản Thực Tế</h3>
+            <p><strong>Chức năng:</strong> Bản in PDF được thiết kế chuyên nghiệp, trực quan để gửi trực tiếp cho khách hàng. File PDF chứa đầy đủ thông tin định danh lô hàng, tóm tắt các khoản chi phí phân bổ và bảng chi tiết phân bổ cho từng dòng hàng.</p>
+            <p><strong>Cấu trúc chi tiết của file PDF báo giá bao gồm:</strong></p>
+            <ul style="padding-left:20px; margin-bottom:16px;">
+              <li><strong>Phần tiêu đề (Header)</strong>: Tên doanh nghiệp Eureka Logistics, số báo giá, ngày xuất bản và thông tin định danh lô hàng của khách hàng (VIP level).</li>
+              <li><strong>Phần thông số vận chuyển</strong>: Thể hiện rõ tổng thể tích thực tế (CBM), tổng trọng lượng thực tế (KG), tuyến đường vận chuyển (đường biển LCL/FCL, đường bộ), cùng tỷ giá ngoại tệ USD/VND và RMB/VND áp dụng.</li>
+              <li><strong>Bảng tổng hợp chi phí toàn cont/lô hàng</strong>: Liệt kê chi tiết 11 danh mục chi phí (cước vận chuyển quốc tế, các loại phí dịch vụ hải quan, phí nội địa, các loại thuế nhập khẩu phát sinh) cùng dòng tổng kết <strong>"Tổng Chi phí + Thuế trực tiếp"</strong> nằm ở cuối cùng giúp khách hàng nắm bắt nhanh tổng quan tài chính.</li>
+              <li><strong>Bảng chi tiết phân bổ cho từng mặt hàng (Breakdown Table)</strong>: Bảng chia nhỏ chi phí cho từng mã hàng, bao gồm: Tên hàng, Số lượng, Trị giá (ngoại tệ & VND), Thuế NK phân bổ, Thuế VAT phân bổ, các loại phí phân bổ tương ứng và cột cuối cùng là <strong>Đơn giá xuất hóa đơn (VND) đã bao gồm đầy đủ VAT nhập khẩu</strong>.</li>
+            </ul>
+            <img src="img_pdf_preview.png" alt="Cấu trúc file PDF báo giá thực tế" style="display:block; max-width:100%; border:1.5px solid var(--border-light); border-radius:8px; margin-top:12px; box-shadow:var(--shadow-sm);">
+          </div>
+
+          <div style="margin-bottom:32px;">
+            <h3 style="color:var(--primary); border-bottom:1.5px solid var(--border-light); padding-bottom:8px; margin-bottom:12px; font-size:1.15rem; font-weight:600;">6. Quản Lý & Đồng Bộ Danh Bạ Khách Hàng (Google Sheets)</h3>
+            <p><strong>Chức năng:</strong> Tích hợp quản lý danh bạ khách hàng tập trung và đồng bộ tự động lên Google Sheets (bảng tính <code>DanhBaKhachHang</code>) theo thời gian thực.</p>
+            <p><strong>Hướng dẫn sử dụng:</strong></p>
+            <ul style="padding-left:20px; margin-bottom:16px;">
+              <li><strong>Tab Danh Bạ Khách Hàng</strong> đã được đưa ra thanh điều hướng chính để mọi nhân viên đều có thể truy cập nhanh.</li>
+              <li><strong>Phân quyền hiển thị:</strong> Tài khoản Sales chỉ có quyền nhìn thấy, chọn nhanh hoặc chỉnh sửa/xóa các khách hàng do chính tài khoản của mình tạo ra (lọc theo cột <em>Người Tạo</em>). Tài khoản Admin có quyền quản lý toàn bộ danh sách khách hàng của tất cả mọi người trong hệ thống.</li>
+              <li><strong>Lưu trực tiếp khi tạo HĐ/PO:</strong> Tại modal Tạo Hợp Đồng & PO, ngoài việc tự động lưu khi tải file HĐ, bạn có thể nhấn nút <strong>Lưu Khách Hàng Vào Danh Bạ</strong> để lưu hoặc cập nhật thông tin khách hàng lên hệ thống ngay lập tức mà không cần xuất file.</li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom:32px;">
+            <h3 style="color:var(--primary); border-bottom:1.5px solid var(--border-light); padding-bottom:8px; margin-bottom:12px; font-size:1.15rem; font-weight:600;">7. Trường "Giá Nền" Trong Công Cụ Cộng Dồn Chi Phí</h3>
+            <p><strong>Chức năng:</strong> Hỗ trợ nhập độc lập giá bán (báo giá cho khách) và giá nền (giá vốn gốc phải trả cho nhà cung cấp/đối tác) của từng đầu chi phí để tính toán chính xác <strong>Giá vốn lô hàng (Cost Price)</strong> và Lợi nhuận dự kiến.</p>
+            <p><strong>Hướng dẫn sử dụng:</strong></p>
+            <ul style="padding-left:20px; margin-bottom:16px;">
+              <li>Tại khung <strong>Cộng dồn & Phân loại chi phí</strong>, điền số tiền báo giá cho khách vào ô <em>Số tiền</em> và điền giá gốc vào ô <em>Giá nền (nếu có)</em>.</li>
+              <li>Nếu không có chênh lệch (giá bán bằng giá vốn), bạn có thể <strong>để trống ô Giá nền</strong>, hệ thống sẽ tự động gán giá nền bằng số tiền báo giá.</li>
+              <li>Khi nhấn Cộng dồn, số tiền báo giá sẽ được cộng vào chi phí chung để phân bổ vào đơn giá xuất hóa đơn của dòng hàng, còn số tiền giá nền sẽ được cộng trực tiếp vào <strong>Giá vốn lô hàng (Cost Price)</strong>.</li>
+              <li><strong>Mặc định hàng FCL:</strong> Giá vốn ban đầu của hàng FCL mặc định bằng 0. Giá vốn của cont FCL sẽ được cộng tích lũy dần từ các khoản giá nền của chi phí phát sinh mà bạn nhập vào.</li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom:10px;">
+            <h3 style="color:var(--primary); border-bottom:1.5px solid var(--border-light); padding-bottom:8px; margin-bottom:12px; font-size:1.15rem; font-weight:600;">8. Xuất Excel Khai Báo Hải Quan Chuyên Dụng (Mẫu 16 Cột)</h3>
+            <p><strong>Chức năng:</strong> Tự động đổ dữ liệu tính toán phân bổ của các mặt hàng thẳng vào tệp mẫu khai báo hải quan chuyên dụng <code>muchangmau.xlsx</code>, giữ nguyên cấu trúc và định dạng gốc của tệp mẫu.</p>
+            <p><strong>Hướng dẫn sử dụng:</strong></p>
+            <ul style="padding-left:20px; margin-bottom:16px;">
+              <li>Sau khi hoàn thành tính toán phân bổ LCL hoặc FCL, nhấn nút <strong>Xuất file Excel</strong> ở phần kết quả phía dưới.</li>
+              <li>Hệ thống sẽ giải mã dữ liệu tệp mẫu hải quan trong bộ nhớ và điền tự động vào các cột tương ứng:
+                <ul style="padding-left:20px; margin-top:6px;">
+                  <li><strong>Cột B (Tên thương mại...)</strong>: Tên mặt hàng.</li>
+                  <li><strong>Cột J (Số lượng S/P)</strong>: Số lượng hàng hóa.</li>
+                  <li><strong>Cột N (Giá khai Thực tế - USD)</strong>: Đơn giá khai báo bằng USD đã được phân bổ phí (DAP đối với LCL, EXW đối với FCL).</li>
+                  <li><strong>Cột O (Thành tiền - USD)</strong>: Tổng giá trị hàng hóa bằng USD (Số lượng × Đơn giá USD).</li>
+                  <li><strong>Cột P (Tên yêu cầu xuất hóa đơn)</strong>: Lấy theo Tên mặt hàng và tự động <strong>giới hạn tối đa 100 ký tự</strong>.</li>
+                </ul>
+              </li>
+              <li>Các cột khác không có thông tin sẽ được để trống hoàn toàn để phục vụ mục đích khai báo hải quan.</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    © 2026 Eureka Logistics — Công cụ Ước Tính Giá Khai Báo 1 Sổ (Nội bộ) • Phân bổ theo Trị giá hàng hóa (C2)
+  </footer>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <!-- ═══ LOGIN SCREEN OVERLAY ═══ -->
+  <div id="login-overlay" style="position:fixed; inset:0; background:rgba(253, 248, 244, 0.95); backdrop-filter:blur(10px); z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px;">
+    <div class="section-card animate-in" style="width:100%; max-width:400px; box-shadow:var(--shadow-lg); border:1px solid var(--border-accent);">
+      <div class="section-header" style="justify-content:center; flex-direction:column; padding:30px 20px 20px; background:var(--bg-card-alt); border-bottom:none;">
+        <img src="logo.jpg" alt="Eureka Logistics" style="width:60px; height:60px; border-radius:12px; margin-bottom:12px; border:2px solid var(--border);">
+        <div class="section-title" style="font-size:1.3rem; text-align:center;">EUREKA LOGISTICS</div>
+        <div class="section-desc" style="text-align:center;">Hệ thống Ước Tính Chi Phí và Giá Khai Báo 1 Sổ</div>
+      </div>
+      <div class="section-body" style="padding:24px;">
+        <form id="login-form" onsubmit="return false;" style="display:flex; flex-direction:column; gap:16px;">
+          <div class="form-group">
+            <label class="form-label">Tên đăng nhập</label>
+            <input type="text" id="login-username" class="form-input" required placeholder="Nhập tên đăng nhập">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mật khẩu</label>
+            <input type="password" id="login-password" class="form-input" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg" style="margin-top:8px;">Đăng Nhập</button>
+        </form>
+        <div id="login-error-msg" style="color:var(--danger); font-size:0.8rem; font-weight:600; text-align:center; margin-top:12px; display:none;">
+          Tên đăng nhập hoặc mật khẩu không chính xác!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div id="edit-user-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:99999; display:none; align-items:center; justify-content:center; padding:20px;">
+    <div class="section-card" style="width:100%; max-width:400px; box-shadow:var(--shadow-lg); border:1px solid var(--border-accent); background:var(--bg-card);">
+      <div class="section-header" style="padding:20px; border-bottom:1px solid var(--border-light);">
+        <div class="section-title" style="font-size:1.1rem;">Chỉnh Sửa Tài Khoản</div>
+      </div>
+      <div class="section-body" style="padding:20px;">
+        <form id="edit-user-form" style="display:flex; flex-direction:column; gap:16px;">
+          <input type="hidden" id="edit-old-username">
+          <div class="form-group">
+            <label class="form-label">Tên đăng nhập</label>
+            <input type="text" id="edit-username" class="form-input" required placeholder="Tên đăng nhập">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tên hiển thị</label>
+            <input type="text" id="edit-displayname" class="form-input" required placeholder="Tên hiển thị">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mật khẩu mới</label>
+            <input type="text" id="edit-password" class="form-input" required placeholder="Nhập mật khẩu mới">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quyền hạn</label>
+            <select id="edit-role" class="form-input" style="cursor:pointer;">
+              <option value="user">Sales (Nhân viên)</option>
+              <option value="admin">Admin (Quản trị)</option>
+            </select>
+          </div>
+          <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:8px;">
+            <button type="button" class="btn btn-secondary" id="edit-user-cancel-btn">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Tool Modal -->
+  <div id="edit-tool-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:99999; display:none; align-items:center; justify-content:center; padding:20px;">
+    <div class="section-card" style="width:100%; max-width:400px; box-shadow:var(--shadow-lg); border:1px solid var(--border-accent); background:var(--bg-card);">
+      <div class="section-header" style="padding:20px; border-bottom:1px solid var(--border-light);">
+        <div class="section-title" style="font-size:1.1rem;">Chỉnh Sửa Công Cụ Hỗ Trợ</div>
+      </div>
+      <div class="section-body" style="padding:20px;">
+        <form id="edit-tool-form" style="display:flex; flex-direction:column; gap:16px;">
+          <input type="hidden" id="edit-tool-index">
+          <div class="form-group">
+            <label class="form-label">Tên công cụ</label>
+            <input type="text" id="edit-tool-name" class="form-input" required placeholder="Tên công cụ">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Đường dẫn liên kết (URL)</label>
+            <input type="text" id="edit-tool-url" class="form-input" required placeholder="https://example.com...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mô tả ngắn gọn (Không bắt buộc)</label>
+            <input type="text" id="edit-tool-desc" class="form-input" placeholder="Mô tả công dụng...">
+          </div>
+          <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:8px;">
+            <button type="button" class="btn btn-secondary" id="edit-tool-cancel-btn">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ USER PROFILE & PERSONAL SHEET SETTINGS MODAL ═══ -->
+  <div id="user-profile-modal" class="modal-overlay" style="display:none;">
+    <div class="section-card modal-card" style="width:100%; max-width:560px; max-height:90vh; overflow-y:auto;">
+      <div class="section-header" style="justify-space-between; display:flex; align-items:center;">
+        <div>
+          <div class="section-title">Thiết Đặt Hồ Sơ & Sheet Cá Nhân</div>
+          <div class="section-desc">Cấu hình link Google Sheet riêng để tự động đồng bộ song song lịch sử tính toán</div>
+        </div>
+        <button type="button" class="btn-close" id="profile-modal-close-btn">&times;</button>
+      </div>
+      <div class="section-body" style="padding:20px;">
+        
+        <!-- Account Info Header -->
+        <div style="background:var(--bg-card-alt); border:1px solid var(--border-accent); border-radius:var(--radius-md); padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">Tài khoản đăng nhập</div>
+            <div style="font-weight:700; font-size:0.95rem; color:var(--text-primary);" id="profile-user-display">---</div>
+          </div>
+          <div id="profile-role-badge" class="history-badge fcl" style="padding:4px 10px; font-size:0.75rem;">Sales</div>
+        </div>
+
+        <!-- Personal Sheet Form -->
+        <form id="personal-sheet-form" style="display:flex; flex-direction:column; gap:14px;">
+          <div class="form-group">
+            <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>Link Google Sheet Cá Nhân (Apps Script URL)</span>
+              <span id="personal-sheet-status-badge" class="history-badge" style="padding:2px 8px; font-size:0.7rem; display:none;">Chưa cấu hình</span>
+            </label>
+            <input type="url" id="personal-sheet-url" class="form-input" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+            <span class="form-hint" style="margin-top:4px;">Dán đường dẫn Apps Script Web App Google Sheet của bạn vào đây (theo dõi tiện lợi).</span>
+          </div>
+
+          <!-- Supabase Database Config Section -->
+          <div style="border-top:1px solid var(--border-light); padding-top:12px; margin-top:4px;">
+            <div style="font-weight:700; font-size:0.85rem; color:var(--text-primary); margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
+              <span>Database Riêng Bảo Mật (Supabase PostgreSQL)</span>
+              <span id="supabase-status-badge" class="history-badge" style="padding:2px 8px; font-size:0.7rem; display:none;">Chưa cấu hình</span>
+            </div>
+            <div class="form-group" style="margin-bottom:8px;">
+              <label class="form-label">Supabase Project URL</label>
+              <input type="url" id="supabase-url-input" class="form-input" placeholder="https://xyzabcdef.supabase.co">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Supabase Anon Public Key</label>
+              <input type="password" id="supabase-key-input" class="form-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+              <span class="form-hint" style="margin-top:4px;">Hệ thống sẽ tự động lưu song song vào cả Supabase (bảo mật) và Google Sheet (theo dõi).</span>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:6px;">
+            <button type="button" class="btn btn-secondary" id="toggle-guide-btn">Hướng dẫn lấy Link</button>
+            <button type="submit" class="btn btn-primary" id="save-profile-btn">Lưu Cấu Hình</button>
+          </div>
+        </form>
+
+        <!-- Expandable Setup Guide & Sample Code -->
+        <div id="apps-script-guide-box" style="display:none; margin-top:20px; border-top:1.5px dashed var(--border); padding-top:16px;">
+          <h4 style="color:var(--accent); font-size:0.9rem; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+            Hướng Dẫn Tạo Google Sheet Cá Nhân & Web App (6 Bước)
+          </h4>
+          <ol style="font-size:0.8rem; color:var(--text-secondary); margin-left:18px; line-height:1.6; display:flex; flex-direction:column; gap:6px;">
+            <li>Mở <strong>Google Sheet</strong> mới trên Google Drive cá nhân của bạn.</li>
+            <li>Trên thanh menu Google Sheet, chọn <strong>Extensions (Tiện ích mở rộng)</strong> &rarr; <strong>Apps Script</strong>.</li>
+            <li>Xóa toàn bộ mã mặc định, dán đoạn mã mẫu <code>doPost(e)</code> bên dưới vào editor và nhấn <strong>Save (Ctrl+S)</strong>.</li>
+            <li>Bấm nút <strong>Deploy (Triển khai)</strong> ở góc trên bên phải &rarr; chọn <strong>New deployment (Triển khai mới)</strong> &rarr; Biểu tượng bánh răng chọn <strong>Web app</strong>.</li>
+            <li>Cấu hình các mục:
+              <ul style="margin-left:16px; margin-top:4px;">
+                <li><em>Execute as (Thực thi dưới dạng)</em>: <strong>Me (Tôi)</strong></li>
+                <li><em>Who has access (Ai có quyền truy cập)</em>: <strong>Anyone (Bất kỳ ai)</strong></li>
+              </ul>
+            </li>
+            <li>Nhấn <strong>Deploy</strong>, cấp quyền cho script và copy đường dẫn <strong>Web App URL</strong> dán vào ô bên trên.</li>
+          </ol>
+
+          <!-- Code Snippet Header & Copy Button -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; margin-bottom:6px;">
+            <span style="font-size:0.8rem; font-weight:700; color:var(--text-primary);">Mã Nguồn Google Apps Script Mẫu (code.gs):</span>
+            <button type="button" class="btn btn-secondary btn-sm" id="copy-script-code-btn" style="padding:3px 10px; font-size:0.75rem;">Copy Mã Code</button>
+          </div>
+
+          <!-- Code Snippet Box -->
+          <pre id="apps-script-code-snippet" style="background:#1e1e2e; color:#a6adc8; padding:12px; border-radius:8px; font-size:0.75rem; overflow-x:auto; font-family:monospace; max-height:220px; line-height:1.4; border:1px solid #313244;"><code>function doPost(e) {
+  try {
+    var contents = JSON.parse(e.postData.contents);
+    var action = contents.action;
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("LichSuTinhToan");
+    
+    if (!sheet) {
+      sheet = ss.insertSheet("LichSuTinhToan");
+      sheet.appendRow([
+        "Thời Gian", "Loại Lô Hàng", "ID Lô Hàng", "Tổng Trị Giá (VND)", 
+        "Cước VC / Chi Phí", "Số Mặt Hàng", "Tỷ Giá USD", "Tỷ Giá RMB", "Chi Tiết Dữ Liệu (JSON)"
+      ]);
+      sheet.getRange(1, 1, 1, 9).setFontWeight("bold").setBackground("#f2f2f2");
+    }
+    
+    if (action === "save_calculation") {
+      var data = contents.data;
+      sheet.appendRow([
+        data.timestamp || new Date().toISOString(),
+        data.type || "",
+        data.id || "",
+        data.totalValue || 0,
+        JSON.stringify(data.shared || {}),
+        (data.items || []).length,
+        data.exchangeRate || "",
+        data.exchangeRateRMB || "",
+        JSON.stringify(data)
+      ]);
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        message: "Đã lưu vào Sheet cá nhân thành công"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false,
+      message: "Action không được hỗ trợ"
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false,
+      error: err.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "active",
+    message: "Eureka Personal Sheet Sync Apps Script Web App is working!"
+  })).setMimeType(ContentService.MimeType.JSON);
+}</code></pre>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!--        TAB 6: BUYERS DIRECTORY      -->
+  <!-- ═══════════════════════════════════ -->
+  <div class="tab-content" id="tab-buyers">
+    <div class="admin-grid-2" style="grid-template-columns: 1fr 2fr; gap:20px;">
+      <!-- Add/Edit Buyer Card -->
+      <div class="section-card">
+        <div class="section-header">
+          <div>
+            <div class="section-title" id="buyer-form-title">Thêm Khách Hàng Mới</div>
+            <div class="section-desc">Lưu thông tin khách hàng vào danh bạ Google Sheets</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <form id="admin-buyer-form" style="display:flex; flex-direction:column; gap:12px;">
+            <input type="hidden" id="admin-buyer-old-name">
+            <div class="form-group">
+              <label class="form-label">Tên Công Ty / Khách Hàng</label>
+              <input type="text" id="admin-buyer-name" class="form-input" required placeholder="Nhập tên bên mua">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Địa Chỉ</label>
+              <input type="text" id="admin-buyer-addr" class="form-input" required placeholder="Nhập địa chỉ">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mã Số Thuế</label>
+              <input type="text" id="admin-buyer-tax" class="form-input" placeholder="Nhập mã số thuế">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Điện Thoại</label>
+              <input type="text" id="admin-buyer-phone" class="form-input" placeholder="Nhập số điện thoại">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" id="admin-buyer-email" class="form-input" placeholder="Nhập email">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Người Đại Diện</label>
+              <input type="text" id="admin-buyer-rep" class="form-input" placeholder="Nhập người đại diện">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Chức Vụ</label>
+              <input type="text" id="admin-buyer-position" class="form-input" placeholder="Nhập chức vụ">
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button type="submit" class="btn btn-primary" id="btn-save-admin-buyer" style="flex:1;">Lưu Khách Hàng</button>
+              <button type="button" class="btn btn-secondary" id="btn-cancel-admin-buyer" style="display:none; padding: 10px;">Hủy</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Buyers List Card -->
+      <div class="section-card">
+        <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div class="section-title">Danh Bạ Khách Hàng</div>
+            <div class="section-desc" id="admin-buyer-count">Đang tải danh sách...</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="items-container" style="overflow-x:auto;">
+            <table class="items-table" style="min-width:700px; font-size:0.8rem;">
+              <thead>
+                <tr>
+                  <th>Tên Khách Hàng</th>
+                  <th>Mã Số Thuế</th>
+                  <th>Điện Thoại / Email</th>
+                  <th>Đại Diện</th>
+                  <th>Người Tạo</th>
+                  <th>Hành Động</th>
+                </tr>
+              </thead>
+              <tbody id="admin-buyer-list-body">
+                <!-- Danh sách khách hàng load động ở đây -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CONTRACT CONFIG MODAL ═══ -->
+  <div id="contract-config-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:99999; display:none; align-items:flex-start; justify-content:center; padding:12px; overflow-y:auto;">
+    <div class="section-card" style="width:100%; max-width:600px; box-shadow:var(--shadow-lg); border:1px solid var(--border-accent); background:var(--bg-card); margin:auto;">
+      <div class="section-header" style="padding:20px; border-bottom:1px solid var(--border-light); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div class="section-title" style="font-size:1.2rem;">Cấu Hình & Xuất Hợp Đồng / PO</div>
+          <div class="section-desc">Điền thông tin bên mua (Khách hàng) và số văn bản để tự động xuất file Word</div>
+        </div>
+        <button type="button" class="btn-close" id="contract-modal-close-btn" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-secondary);">&times;</button>
+      </div>
+      <div class="section-body" style="padding:20px;">
+        <form id="contract-config-form" style="display:flex; flex-direction:column; gap:16px;">
+          <!-- Hidden inputs to track context -->
+          <input type="hidden" id="contract-context-type">
+
+          <div class="contract-grid-2">
+            <div class="form-group">
+              <label class="form-label">Số Hợp Đồng</label>
+              <input type="text" id="contract-no" class="form-input" placeholder="Ví dụ: 01">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Số Đơn Hàng (PO)</label>
+              <input type="text" id="contract-po-no" class="form-input" placeholder="Ví dụ: 01">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Ngày Ký Kết Hợp Đồng & PO</label>
+            <input type="text" id="contract-date" class="form-input" placeholder="Ví dụ: ngày 28 tháng 07 năm 2026">
+          </div>
+
+          <div style="font-weight:700; font-size:0.88rem; color:var(--accent); border-bottom:1px solid var(--border-light); padding-bottom:4px; margin-top:8px;">
+            THÔNG TIN BÊN MUA (BÊN B / KHÁCH HÀNG)
+          </div>
+
+          <div class="form-group" id="contract-buyer-select-group">
+            <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>Chọn Từ Danh Bạ Khách Hàng</span>
+              <button type="button" id="btn-clear-buyer-form" class="btn btn-secondary btn-sm" style="padding:2px 8px; font-size:0.7rem; border-radius:4px;" title="Xóa form để nhập khách hàng mới">Nhập mới</button>
+            </label>
+            <select id="contract-buyer-select" class="form-input" style="cursor:pointer;">
+              <option value="">-- Nhập Khách Hàng Mới --</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tên Công Ty / Cá Nhân Bên Mua</label>
+            <input type="text" id="contract-buyer-name" class="form-input" required placeholder="Nhập tên bên mua">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Địa Chỉ</label>
+            <input type="text" id="contract-buyer-addr" class="form-input" required placeholder="Nhập địa chỉ bên mua">
+          </div>
+
+          <div class="contract-grid-3">
+            <div class="form-group">
+              <label class="form-label">Mã Số Thuế (nếu có)</label>
+              <input type="text" id="contract-buyer-tax" class="form-input" placeholder="Nhập mã số thuế">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Điện Thoại</label>
+              <input type="text" id="contract-buyer-phone" class="form-input" placeholder="Nhập số điện thoại">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" id="contract-buyer-email" class="form-input" placeholder="Nhập email">
+            </div>
+          </div>
+
+          <div class="contract-grid-2">
+            <div class="form-group">
+              <label class="form-label">Người Đại Diện</label>
+              <input type="text" id="contract-buyer-rep" class="form-input" placeholder="Ví dụ: Nguyễn B">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Chức Vụ</label>
+              <input type="text" id="contract-buyer-position" class="form-input" placeholder="Ví dụ: Giám đốc">
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end;">
+            <button type="button" class="btn btn-secondary" id="btn-modal-save-buyer" style="background:#4f46e5; color:#fff; border:1px solid #4f46e5; font-size:0.85rem; padding:6px 12px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+              Lưu Khách Hàng Vào Danh Bạ
+            </button>
+          </div>
+
+          <div style="margin-top:16px; border-top:1px solid var(--border-light); padding-top:16px; display:flex; flex-direction:column; gap:16px;">
+            <!-- Group 1: 2-contract package (Principal Contract + PO) -->
+            <div>
+              <div style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">Phương Án 1: HĐ Nguyên Tắc + Đơn Đặt Hàng (Mẫu 1 & 2)</div>
+              <div class="contract-btn-row">
+                <button type="button" class="btn btn-success btn-lg" id="btn-download-word-contract-nt" style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px; background:#10b981; border-color:#10b981;">
+                  Tải HĐ Nguyên Tắc (Mẫu 1)
+                </button>
+                <button type="button" class="btn btn-primary btn-lg" id="btn-download-word-po" style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px; background:#e8734a; border-color:#e8734a;">
+                  Tải Đơn Đặt Hàng (Mẫu 2)
+                </button>
+              </div>
+            </div>
+
+            <!-- Group 2: Single Sales Contract (Sales Contract) -->
+            <div>
+              <div style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">Phương Án 2: Hợp Đồng Mua Bán Hàng Hóa (Mẫu 3)</div>
+              <button type="button" class="btn btn-primary btn-lg" id="btn-download-word-contract-mb" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; background:#8b5cf6; border-color:#8b5cf6; color:#fff;">
+                Tải HĐ Mua Bán Hàng Hóa (Mẫu 3)
+              </button>
+            </div>
+
+            <!-- Group 3: Appendix / Addendum (Mẫu 4 & 5) -->
+            <div>
+              <div style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">Phương Án 3: Phụ Lục Điều Chỉnh Hợp Đồng & Đơn Hàng</div>
+              <div class="contract-btn-row">
+                <button type="button" class="btn btn-warning btn-lg" id="btn-download-word-appendix-contract" style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px; background:#f59e0b; border-color:#f59e0b; color:#fff;">
+                  Tải Phụ Lục HĐ (Mẫu 4)
+                </button>
+                <button type="button" class="btn btn-warning btn-lg" id="btn-download-word-appendix-po" style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px; background:#d97706; border-color:#d97706; color:#fff;">
+                  Tải Phụ Lục Đơn Hàng (Mẫu 5)
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Security & Database Modules -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="security.js?v=1.0.0"></script>
+  <script src="supabase-client.js?v=1.0.0"></script>
+  <!-- App JS -->
+  <script src="app.js?v=2.4.0"></script>
+</body>
+</html>
