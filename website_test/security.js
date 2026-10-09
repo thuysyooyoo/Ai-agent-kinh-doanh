@@ -323,47 +323,15 @@ window.EurekaSecurity = (function () {
   }
 
   // ═══════════════════════════════════
-  // 7. ANTI-INSPECT & VIEW-SOURCE SHIELD (Chống soi mã & công thức)
+  // 7. ANTI-INSPECT & VIEW-SOURCE SHIELD (Đã tắt theo yêu cầu để debug)
   // ═══════════════════════════════════
 
   function enableSourceProtection() {
-    // 1. Chặn chuột phải
-    document.addEventListener('contextmenu', function (e) {
-      e.preventDefault();
-      return false;
-    });
-
-    // 2. Chặn các phím tắt mở DevTools và View Source
-    document.addEventListener('keydown', function (e) {
-      // F12
-      if (e.key === 'F12' || e.keyCode === 123) {
-        e.preventDefault();
-        return false;
-      }
-      // Ctrl+U (View Source)
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
-        e.preventDefault();
-        return false;
-      }
-      // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C (DevTools)
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67 || e.key === 'I' || e.key === 'J' || e.key === 'C')) {
-        e.preventDefault();
-        return false;
-      }
-      // Ctrl+S (Chặn lưu toàn bộ trang)
-      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
-        e.preventDefault();
-        return false;
-      }
-    });
+    // Đã mở khóa F12, chuột phải và DevTools
   }
 
-  // Tự động kích hoạt khi trang tải xong
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', enableSourceProtection);
-  } else {
-    enableSourceProtection();
-  }
+  // Không chặn inspect nữa
+
 
   // ═══════════════════════════════════
   // PUBLIC API

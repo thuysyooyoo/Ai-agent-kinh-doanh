@@ -61,19 +61,39 @@
     return trimmed.startsWith('https://script.google.com/macros/s/') && trimmed.endsWith('/exec');
   }
 
+  function normalizePhoneNumber(phone) {
+    if (!phone) return '';
+    let str = String(phone).trim();
+    let clean = str.replace(/[\s\.\-]/g, '');
+    if (/^\d{9}$/.test(clean)) {
+      return '0' + clean;
+    }
+    if (/^(\+?84)(\d{9})$/.test(clean)) {
+      return '0' + clean.replace(/^(\+?84)/, '');
+    }
+    return str;
+  }
+
   function getBuyers() {
     try {
       const buyers = localStorage.getItem('eureka_buyers');
       const parsed = buyers ? JSON.parse(buyers) : [];
-      return Array.isArray(parsed) ? parsed : [];
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map(b => ({
+        ...b,
+        phone: normalizePhoneNumber(b.phone || '')
+      }));
     } catch (e) {
       return [];
     }
   }
 
   function saveBuyerLocally(buyer) {
+    if (buyer && buyer.phone) {
+      buyer.phone = normalizePhoneNumber(buyer.phone);
+    }
     let buyers = getBuyers();
-    const index = buyers.findIndex(b => b.name.toLowerCase() === buyer.name.toLowerCase());
+    const index = buyers.findIndex(b => String(b.name || '').toLowerCase() === String(buyer.name || '').toLowerCase());
     if (index !== -1) {
       buyers[index] = buyer;
     } else {
@@ -181,7 +201,7 @@
           if (confirm(`Bạn có chắc muốn xóa khách hàng "${b.name}" khỏi danh bạ trên hệ thống?`)) {
             // Remove from local storage
             let allBuyers = getBuyers();
-            allBuyers = allBuyers.filter(x => x.name.toLowerCase() !== b.name.toLowerCase());
+            allBuyers = allBuyers.filter(x => String(x.name || '').toLowerCase() !== String(b.name || '').toLowerCase());
             localStorage.setItem('eureka_buyers', JSON.stringify(allBuyers));
             
             // Re-render
@@ -212,19 +232,34 @@
     });
   }
 
-  function getSheetToken() {
+  let cachedSheetToken = null;
+  async function getSheetToken() {
     const customToken = localStorage.getItem('eureka_sheet_token');
     if (customToken && customToken.trim().length > 0) {
       return customToken.trim();
     }
-    return 'EUREKA_SECURE_TOKEN_2026_X9#mK!';
+    if (cachedSheetToken) return cachedSheetToken;
+    
+    // Nếu dùng Supabase, tải token an toàn từ backend
+    if (window.EurekaDB && window.EurekaDB.isConfigured()) {
+       const client = window.EurekaDB.getClient();
+       if (client) {
+         const { data, error } = await client.rpc('get_secure_sheet_token');
+         if (!error && data) {
+           cachedSheetToken = data;
+           return cachedSheetToken;
+         }
+       }
+    }
+    return ''; // Không trả về mã cứng nữa
   }
 
   async function callSheetAPI(payload, targetUrl = null) {
     const url = targetUrl || GOOGLE_SHEET_URL;
     if (!url) return null;
     try {
-      const enrichedPayload = Object.assign({}, payload, { token: getSheetToken() });
+      const token = await getSheetToken();
+      const enrichedPayload = Object.assign({}, payload, { token: token });
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -243,7 +278,8 @@
     if (!GOOGLE_SHEET_URL) return;
     try {
       const loggedUser = getCurrentUsername();
-      let queryUrl = GOOGLE_SHEET_URL + '?action=get_data&token=' + encodeURIComponent(getSheetToken());
+      const token = await getSheetToken();
+      let queryUrl = GOOGLE_SHEET_URL + '?action=get_data&token=' + encodeURIComponent(token);
       if (loggedUser) {
         queryUrl += '&username=' + encodeURIComponent(loggedUser);
       }
@@ -298,14 +334,22 @@
           localStorage.setItem('eureka_support_tools', JSON.stringify(cachedData.tools));
         }
         if (cachedData.buyers && Array.isArray(cachedData.buyers)) {
-          localStorage.setItem('eureka_buyers', JSON.stringify(cachedData.buyers));
+          const cleanBuyers = cachedData.buyers.map(b => ({
+            ...b,
+            phone: normalizePhoneNumber(b.phone || '')
+          }));
+          localStorage.setItem('eureka_buyers', JSON.stringify(cleanBuyers));
         }
         // Tải thông tin bên bán Bên A mặc định từ Sheets
         if (cachedData.seller && typeof cachedData.seller === 'object') {
           const s = cachedData.seller;
           if (s.name && String(s.name).toLowerCase().trim() !== 'address') {
             const currentSeller = getSellerInfo();
-            const mergedSeller = { ...currentSeller, ...s };
+            const mergedSeller = {
+              ...currentSeller,
+              ...s,
+              phone: normalizePhoneNumber(s.phone || currentSeller.phone || '')
+            };
             localStorage.setItem('eureka_contract_seller_info', JSON.stringify(mergedSeller));
             console.log('[Seller] Đã tải thông tin bên bán Bên A từ Google Sheets:', mergedSeller.name);
             
@@ -339,17 +383,83 @@
 
   }
 
-  // ── [BẢO MẬT & ĐỒNG BỘ] Tải toàn bộ dữ liệu từ Google Sheets sau khi đăng nhập ──
+  // ── [KIẾN TRÚC MỚI] Nguồn Sự Thật Duy Nhất: Tải trực tiếp 100% từ Supabase Core ──
   let _dataLoadedAfterLogin = false;
 
-  async function _loadDataAfterLogin() {
-    if (!GOOGLE_SHEET_URL) return;
+  async function _loadDataAfterLogin(force = false) {
+    if (_dataLoadedAfterLogin && !force) return;
+    _dataLoadedAfterLogin = true;
+
     try {
-      if (!_dataLoadedAfterLogin) {
-        _dataLoadedAfterLogin = true;
-        sheetLoadPromise = loadDataFromSheet();
-        await sheetLoadPromise;
+      if (window.EurekaDB && window.EurekaDB.isConfigured()) {
+        const sbData = await window.EurekaDB.loadAllFromSupabase();
+        if (sbData) {
+          console.log('[Supabase Core] Đã tải toàn bộ 7 bảng dữ liệu thành công ✅');
+
+          // 1. Tariffs (Bảng phí cước)
+          if (sbData.tariffs && typeof sbData.tariffs === 'object') {
+            const currentTariffs = getTariffs();
+            const mergedTariffs = {
+              ...currentTariffs,
+              ...sbData.tariffs,
+              vipRates: { ...(currentTariffs.vipRates || {}), ...(sbData.tariffs.vipRates || {}) },
+              flexibleM3: { ...(currentTariffs.flexibleM3 || {}), ...(sbData.tariffs.flexibleM3 || {}) },
+              flexibleKG: { ...(currentTariffs.flexibleKG || {}), ...(sbData.tariffs.flexibleKG || {}) }
+            };
+            localStorage.setItem('eureka_tariffs', JSON.stringify(mergedTariffs));
+          }
+
+          // 2. Users (Tài khoản người dùng)
+          if (sbData.accounts && sbData.accounts.length > 0) {
+            localStorage.setItem('eureka_users', JSON.stringify(sbData.accounts));
+          }
+
+          // 3. Buyers (Danh bạ khách hàng)
+          if (sbData.buyers && Array.isArray(sbData.buyers)) {
+            const cleanBuyers = sbData.buyers.map(b => ({
+              ...b,
+              phone: normalizePhoneNumber(b.phone || '')
+            }));
+            localStorage.setItem('eureka_buyers', JSON.stringify(cleanBuyers));
+          }
+
+          // 4. Seller (Thông tin Bên bán Bên A)
+          if (sbData.seller && typeof sbData.seller === 'object' && sbData.seller.name) {
+            localStorage.setItem('eureka_contract_seller_info', JSON.stringify(sbData.seller));
+          }
+
+          // 5. Tools (Công cụ hỗ trợ)
+          if (sbData.tools && Array.isArray(sbData.tools) && sbData.tools.length > 0) {
+            localStorage.setItem('eureka_support_tools', JSON.stringify(sbData.tools));
+          }
+
+          // 6. IP Logs (Nhật ký truy cập)
+          if (sbData.ip_logs && Array.isArray(sbData.ip_logs)) {
+            localStorage.setItem('eureka_ip_logs', JSON.stringify(sbData.ip_logs));
+          }
+
+          // 7. Calculation History (Lịch sử tính giá trong 30 ngày)
+          if (sbData.history && Array.isArray(sbData.history) && sbData.history.length > 0) {
+            let currentHist = getHistory();
+            const existingIds = new Set(currentHist.map(h => String(h.id)));
+            sbData.history.forEach(item => {
+              if (item && item.id && !existingIds.has(String(item.id))) {
+                currentHist.push(item);
+                existingIds.add(String(item.id));
+              }
+            });
+            const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+            currentHist = currentHist.filter(item => {
+              const ts = Number(item.id) || (item.timestamp ? new Date(item.timestamp).getTime() : 0);
+              return ts === 0 || (Date.now() - ts < thirtyDaysMs);
+            });
+            currentHist.sort((a, b) => (b.id || 0) - (a.id || 0));
+            localStorage.setItem('eureka_1so_history', JSON.stringify(currentHist));
+          }
+        }
       }
+
+      // Render toàn bộ giao diện Web ngay lập tức
       try {
         if (typeof renderUserList === 'function') renderUserList();
         if (typeof renderIpLogs === 'function') renderIpLogs();
@@ -370,10 +480,10 @@
         if (document.getElementById('cfg-seller-bank')) document.getElementById('cfg-seller-bank').value = s.bankAccount || '';
         if (document.getElementById('cfg-seller-bank-name')) document.getElementById('cfg-seller-bank-name').value = s.bankName || '';
       } catch (e) {
-        console.error("Error rendering synced data after login:", e);
+        console.error("Lỗi khi hiển thị dữ liệu sau đăng nhập:", e);
       }
     } catch (err) {
-      console.error("Failed to load sheet data after login:", err);
+      console.error("Lỗi tải dữ liệu Supabase sau đăng nhập:", err);
     }
   }
 
@@ -661,6 +771,9 @@
 
   async function saveTariffs(tariffs) {
     localStorage.setItem('eureka_tariffs', JSON.stringify(tariffs));
+    if (window.EurekaDB && window.EurekaDB.isConfigured()) {
+      window.EurekaDB.syncTariffsToSupabase(tariffs);
+    }
     if (GOOGLE_SHEET_URL) {
       return await callSheetAPI({
         action: 'save_tariffs',
@@ -722,6 +835,27 @@
         
         if (btn.id === 'tab-btn-history') {
           renderHistoryDetailList();
+          if (window.EurekaDB && typeof window.EurekaDB.loadHistoryFromSupabase === 'function') {
+            window.EurekaDB.loadHistoryFromSupabase().then(sbHistory => {
+              if (sbHistory && sbHistory.length > 0) {
+                let currentHist = getHistory();
+                const existingIds = new Set(currentHist.map(h => String(h.id)));
+                let added = 0;
+                sbHistory.forEach(item => {
+                  if (item && item.id && !existingIds.has(String(item.id))) {
+                    currentHist.push(item);
+                    existingIds.add(String(item.id));
+                    added++;
+                  }
+                });
+                if (added > 0) {
+                  currentHist.sort((a, b) => (b.id || 0) - (a.id || 0));
+                  localStorage.setItem('eureka_1so_history', JSON.stringify(currentHist));
+                  renderHistoryDetailList();
+                }
+              }
+            }).catch(() => {});
+          }
         }
         if (btn.id === 'tab-btn-support') {
           renderSupportTools();
@@ -1725,9 +1859,18 @@
       if (!history) return [];
       const parsed = JSON.parse(history);
       if (!Array.isArray(parsed)) return [];
-      const tenDaysMs = 10 * 24 * 60 * 60 * 1000;
-      const filtered = parsed.filter(item => item && typeof item === 'object' && item.id && (Date.now() - item.id < tenDaysMs));
-      filtered.sort((a, b) => b.id - a.id);
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+      const filtered = parsed.filter(item => {
+        if (!item || typeof item !== 'object') return false;
+        const ts = Number(item.id) || (item.timestamp ? new Date(item.timestamp).getTime() : 0);
+        if (ts > 0 && (Date.now() - ts > thirtyDaysMs)) return false;
+        return true;
+      });
+      filtered.sort((a, b) => {
+        const timeA = Number(a.id) || (a.timestamp ? new Date(a.timestamp).getTime() : 0);
+        const timeB = Number(b.id) || (b.timestamp ? new Date(b.timestamp).getTime() : 0);
+        return timeB - timeA;
+      });
       return filtered;
     } catch (e) {
       return [];
@@ -1812,8 +1955,11 @@
 
     let history = getHistory();
     history.unshift(data);
-    const tenDaysMs = 10 * 24 * 60 * 60 * 1000;
-    history = history.filter(item => Date.now() - item.id < tenDaysMs);
+    const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+    history = history.filter(item => {
+      const ts = Number(item.id) || (item.timestamp ? new Date(item.timestamp).getTime() : 0);
+      return ts === 0 || (Date.now() - ts < thirtyDaysMs);
+    });
 
     localStorage.setItem('eureka_1so_history', JSON.stringify(history));
 
@@ -1826,6 +1972,12 @@
         customerName: buyerNameVal,
         data_payload: data,
         creator: data.createdBy
+      }).then(res => {
+        if (res && res.success) {
+          console.log('[Supabase] Đã lưu lịch sử tính toán lên Database thành công ✅');
+        } else if (res && res.error) {
+          console.error('[Supabase] Lỗi khi lưu lịch sử:', res.error);
+        }
       });
     }
 
@@ -3268,6 +3420,46 @@
           window.EurekaSecurity.resetRateLimit();
         }
 
+        // ── [BẢO MẬT] Đăng nhập ngầm vào Supabase Auth để có quyền ghi dữ liệu ──
+        if (window.EurekaDB && window.EurekaDB.isConfigured()) {
+          try {
+            const client = window.EurekaDB.getClient();
+            if (client) {
+              const virtualEmail = username.includes('@') ? username : `${username}@eureka.local`;
+              let authResult = await client.auth.signInWithPassword({
+                email: virtualEmail,
+                password: password
+              });
+              if (authResult.error) {
+                console.log('[Supabase Auth] Chưa có tài khoản trong Auth, đang tự động khởi tạo...');
+                const rpcRes = await client.rpc('admin_create_user', {
+                  email: virtualEmail,
+                  password: password,
+                  user_metadata: {
+                    displayName: user.displayName || user.username,
+                    role: user.role || 'sale'
+                  }
+                });
+                if (!rpcRes.error) {
+                  authResult = await client.auth.signInWithPassword({
+                    email: virtualEmail,
+                    password: password
+                  });
+                } else {
+                  console.warn('[Supabase Auth] Tạo tài khoản tự động thất bại:', rpcRes.error.message);
+                }
+              }
+              if (!authResult.error) {
+                console.log('[Supabase Auth] Đăng nhập ngầm thành công — Đã xác thực quyền ghi ✅');
+              } else {
+                console.warn('[Supabase Auth] Không thể đăng nhập ngầm:', authResult.error.message);
+              }
+            }
+          } catch (authErr) {
+            console.warn('[Supabase Auth] Lỗi đăng nhập ngầm:', authErr);
+          }
+        }
+
         sessionStorage.setItem('eureka_logged_in_user', JSON.stringify(user));
         setupSession(user);
         showToast(`Chào mừng trở lại, ${user.displayName || user.username}!`, 'success');
@@ -3303,6 +3495,7 @@
 
     logoutBtn.addEventListener('click', () => {
       sessionStorage.removeItem('eureka_logged_in_user');
+      sessionStorage.removeItem('eureka_vault_session_token');
       showToast('Đã đăng xuất', 'success');
       setTimeout(() => {
         window.location.reload();
@@ -4305,6 +4498,9 @@
 
   async function saveSupportTools(tools) {
     localStorage.setItem('eureka_support_tools', JSON.stringify(tools));
+    if (window.EurekaDB && window.EurekaDB.isConfigured()) {
+      window.EurekaDB.syncSupportToolsToSupabase(tools);
+    }
     if (GOOGLE_SHEET_URL) {
       try {
         const res = await callSheetAPI({
@@ -4906,6 +5102,9 @@
 
   async function saveSellerInfo(info) {
     localStorage.setItem('eureka_contract_seller_info', JSON.stringify(info));
+    if (window.EurekaDB && window.EurekaDB.isConfigured()) {
+      window.EurekaDB.syncSellerToSupabase(info);
+    }
     if (GOOGLE_SHEET_URL) {
       try {
         const res = await callSheetAPI({
@@ -5302,7 +5501,7 @@ ${content}
   function getBuyerInitials(name) {
     if (!name) return 'KH';
     // Remove accents and normalize
-    var str = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    var str = String(name).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     // Replace non-alphanumeric with spaces
     str = str.replace(/[^a-z0-9\s]/g, ' ');
     // Split into words
@@ -5730,8 +5929,8 @@ ${content}
         };
 
         // If editing and changed name, delete the old name on Google Sheets first
-        if (oldName && oldName.toLowerCase() !== name.toLowerCase()) {
-          let allBuyers = getBuyers().filter(x => x.name.toLowerCase() !== oldName.toLowerCase());
+        if (oldName && String(oldName).toLowerCase() !== String(name).toLowerCase()) {
+          let allBuyers = getBuyers().filter(x => String(x.name || '').toLowerCase() !== String(oldName).toLowerCase());
           localStorage.setItem('eureka_buyers', JSON.stringify(allBuyers));
           
           callSheetAPI({
@@ -6060,6 +6259,20 @@ ${content}
 
     // Initialize PWA Setup
     initPWA();
+
+    // ── Realtime & Background Auto-Sync ──
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && sessionStorage.getItem('eureka_logged_in_user')) {
+        console.log('[Realtime] Quay lại tab, tự động kiểm tra và đồng bộ dữ liệu mới nhất...');
+        _loadDataAfterLogin(true);
+      }
+    });
+
+    setInterval(() => {
+      if (sessionStorage.getItem('eureka_logged_in_user')) {
+        _loadDataAfterLogin(true);
+      }
+    }, 60000);
   }
 
   // ── PWA & Push Notifications Setup ──

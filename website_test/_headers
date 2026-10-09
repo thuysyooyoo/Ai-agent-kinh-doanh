@@ -20,7 +20,7 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains
 
   # Content Security Policy — chặn inline script injection
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.sheetjs.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://*.googleusercontent.com https://*.google.com https://*.supabase.co https://api.ipify.org https://ipinfo.io https://ipapi.co; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.sheetjs.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://*.googleusercontent.com https://*.google.com https://*.supabase.co https://api.ipify.org https://ipinfo.io https://ipapi.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
 
   # Chặn tính năng nguy hiểm
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()

@@ -1,10 +1,10 @@
-const CACHE_NAME = 'eureka-cache-v6';
+const CACHE_NAME = 'eureka-vault-v3';
 const ASSETS = [
   './',
   './index.html',
   './style.css',
-  './app.js',
-  './html-docx.js',
+  './vault.data.js',
+  './vault-gate.js',
   './logo.jpg',
   './img_lcl.png',
   './img_fcl.png',

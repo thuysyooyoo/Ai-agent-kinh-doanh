@@ -1,0 +1,17 @@
+# ══════════════════════════════════════════════════════════
+# EUREKA LOGISTICS — NETLIFY ZERO-TRUST ACCESS CONTROL
+# Chặn 100% người dùng / công cụ tải các file mã nguồn gốc
+# Cú pháp 404! (Forced 404) bắt buộc trả về 404 kể cả khi file có trên ổ đĩa
+# ══════════════════════════════════════════════════════════
+
+/app.src.js                  /404   404!
+/supabase-client.js          /404   404!
+/security.js                 /404   404!
+/index.source.html           /404   404!
+/build_vault.js              /404   404!
+/muchangmau.xlsx             /404   404!
+/*.py                        /404   404!
+/*.sql                       /404   404!
+/*.md                        /404   404!
+/*.zip                       /404   404!
+/*.sh                        /404   404!
