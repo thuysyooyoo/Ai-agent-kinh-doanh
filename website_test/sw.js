@@ -1,4 +1,4 @@
-const CACHE_NAME = 'eureka-vault-v5';
+const CACHE_NAME = 'eureka-vault-v6';
 const ASSETS = [
   './',
   './index.html',

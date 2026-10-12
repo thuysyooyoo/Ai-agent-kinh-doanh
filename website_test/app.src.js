@@ -114,7 +114,22 @@
     // Clear options but keep the first one
     select.innerHTML = '<option value="">-- Nhập Khách Hàng Mới --</option>';
     
-    const buyers = getBuyers();
+    let buyers = getBuyers();
+    const username = getCurrentUsername();
+    let isAdmin = false;
+    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    if (loggedUserStr) {
+      try {
+        const u = JSON.parse(loggedUserStr);
+        isAdmin = (u.role === 'admin' || u.username === 'admin');
+      } catch (e) {}
+    }
+
+    // Phân quyền: User thường chỉ thấy khách hàng do chính mình tạo trong dropdown
+    if (!isAdmin && username) {
+      buyers = buyers.filter(b => String(b.createdBy || '').toLowerCase() === username.toLowerCase());
+    }
+
     buyers.forEach(b => {
       const opt = document.createElement('option');
       opt.value = b.name;
@@ -129,7 +144,7 @@
     if (!tbody) return;
 
     tbody.innerHTML = '';
-    const buyers = getBuyers();
+    let buyers = getBuyers();
     const username = getCurrentUsername();
     
     // Check if role is admin
@@ -142,12 +157,19 @@
       } catch (e) {}
     }
 
+    // Phân quyền: Admin xem toàn bộ, User thường chỉ xem khách hàng do chính mình tạo
+    if (!isAdmin && username) {
+      buyers = buyers.filter(b => String(b.createdBy || '').toLowerCase() === username.toLowerCase());
+    }
+
     if (countEl) {
-      countEl.textContent = `${buyers.length} khách hàng được ghi nhận`;
+      countEl.textContent = isAdmin 
+        ? `${buyers.length} khách hàng trên toàn hệ thống`
+        : `${buyers.length} khách hàng của bạn`;
     }
 
     if (buyers.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary); padding: 15px;">Chưa có khách hàng nào trong danh bạ</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary); padding: 15px;">${isAdmin ? 'Chưa có khách hàng nào trong danh bạ' : 'Bạn chưa có khách hàng nào trong danh bạ. Vui lòng thêm khách hàng mới bên trái.'}</td></tr>`;
       return;
     }
 
