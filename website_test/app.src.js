@@ -3522,9 +3522,13 @@
               const secRes = await window.EurekaSecurity.migratePasswordsToHash(fetchedAccounts);
               fetchedAccounts = secRes.users;
             }
-            localStorage.setItem('eureka_users', JSON.stringify(fetchedAccounts));
+            if (username === 'admin') {
+              localStorage.setItem('eureka_users', JSON.stringify(fetchedAccounts));
+            } else {
+              localStorage.removeItem('eureka_users');
+            }
             users = getUsers();
-            user = users.find(u => u.username === username);
+            user = fetchedAccounts.find(u => u.username === username);
           }
         } catch (fetchErr) {
           console.warn('Lỗi kết nối kiểm tra tài khoản từ Google Sheets:', fetchErr);

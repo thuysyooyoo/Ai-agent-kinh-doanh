@@ -225,17 +225,21 @@
         console.warn('[Vault] Lỗi gửi log:', err);
       });
 
-      // 2. Cập nhật vào localStorage để trang Admin hiển thị offline (Lọc giữ lại đúng 7 ngày)
+      // 2. Cập nhật vào localStorage CHỈ KHI là tài khoản Admin (Lọc giữ lại đúng 7 ngày)
       try {
-        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-        let currentLogs = JSON.parse(localStorage.getItem('eureka_ip_logs') || '[]');
-        currentLogs.unshift(logEntry);
-        currentLogs = currentLogs.filter(l => {
-          if (!l || !l.timestamp) return false;
-          const t = new Date(l.timestamp).getTime();
-          return !isNaN(t) && t >= sevenDaysAgo;
-        });
-        localStorage.setItem('eureka_ip_logs', JSON.stringify(currentLogs));
+        if (username.toLowerCase() === 'admin') {
+          const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+          let currentLogs = JSON.parse(localStorage.getItem('eureka_ip_logs') || '[]');
+          currentLogs.unshift(logEntry);
+          currentLogs = currentLogs.filter(l => {
+            if (!l || !l.timestamp) return false;
+            const t = new Date(l.timestamp).getTime();
+            return !isNaN(t) && t >= sevenDaysAgo;
+          });
+          localStorage.setItem('eureka_ip_logs', JSON.stringify(currentLogs));
+        } else {
+          localStorage.removeItem('eureka_ip_logs');
+        }
       } catch (_) {}
 
     } catch (e) {
