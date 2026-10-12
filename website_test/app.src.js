@@ -324,7 +324,18 @@
             localStorage.setItem('eureka_tariffs', JSON.stringify(mergedTariffs));
           }
         }
-        if (cachedData.accounts && cachedData.accounts.length > 0) {
+        const loggedUserStrSheet = sessionStorage.getItem('eureka_logged_in_user');
+        let isAdminSheet = false;
+        let currentUsernameSheet = '';
+        if (loggedUserStrSheet) {
+          try {
+            const u = JSON.parse(loggedUserStrSheet);
+            currentUsernameSheet = (u.username || '').toLowerCase().trim();
+            isAdminSheet = (u.role === 'admin' || currentUsernameSheet === 'admin');
+          } catch (e) {}
+        }
+
+        if (isAdminSheet && cachedData.accounts && cachedData.accounts.length > 0) {
           if (window.EurekaSecurity) {
             try {
               const secRes = await window.EurekaSecurity.migratePasswordsToHash(cachedData.accounts);
@@ -335,9 +346,12 @@
           } else {
             localStorage.setItem('eureka_users', JSON.stringify(cachedData.accounts));
           }
+        } else if (!isAdminSheet) {
+          localStorage.removeItem('eureka_users');
         }
+
         if (cachedData.history && Array.isArray(cachedData.history)) {
-          const normalizedHistory = cachedData.history.map(item => {
+          let normalizedHistory = cachedData.history.map(item => {
             const h = Object.assign({}, item);
             if (!h.shared || typeof h.shared !== 'object') h.shared = {};
             if (!Array.isArray(h.items)) {
@@ -350,16 +364,25 @@
             if (!h.totalValue && h.totalAmount) h.totalValue = Number(h.totalAmount) || 0;
             return h;
           });
+          if (!isAdminSheet && currentUsernameSheet) {
+            normalizedHistory = normalizedHistory.filter(item => {
+              const creator = String(item.createdBy || item.creator || (item.data_payload && item.data_payload.createdBy) || '').toLowerCase().trim();
+              return creator === currentUsernameSheet;
+            });
+          }
           localStorage.setItem('eureka_1so_history', JSON.stringify(normalizedHistory));
         }
         if (cachedData.tools && Array.isArray(cachedData.tools) && cachedData.tools.length > 0) {
           localStorage.setItem('eureka_support_tools', JSON.stringify(cachedData.tools));
         }
         if (cachedData.buyers && Array.isArray(cachedData.buyers)) {
-          const cleanBuyers = cachedData.buyers.map(b => ({
+          let cleanBuyers = cachedData.buyers.map(b => ({
             ...b,
             phone: normalizePhoneNumber(b.phone || '')
           }));
+          if (!isAdminSheet && currentUsernameSheet) {
+            cleanBuyers = cleanBuyers.filter(b => String(b.createdBy || '').toLowerCase().trim() === currentUsernameSheet);
+          }
           localStorage.setItem('eureka_buyers', JSON.stringify(cleanBuyers));
         }
         // Tải thông tin bên bán Bên A mặc định từ Sheets
@@ -412,11 +435,28 @@
     if (_dataLoadedAfterLogin && !force) return;
     _dataLoadedAfterLogin = true;
 
+    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    let isAdmin = false;
+    let currentUsername = '';
+    if (loggedUserStr) {
+      try {
+        const u = JSON.parse(loggedUserStr);
+        currentUsername = (u.username || '').toLowerCase().trim();
+        isAdmin = (u.role === 'admin' || currentUsername === 'admin');
+      } catch (e) {}
+    }
+
+    // Bảo mật: Nếu là tài khoản thường, lập tức dọn dẹp các dữ liệu nhạy cảm khỏi LocalStorage
+    if (!isAdmin) {
+      localStorage.removeItem('eureka_users');
+      localStorage.removeItem('eureka_ip_logs');
+    }
+
     try {
       if (window.EurekaDB && window.EurekaDB.isConfigured()) {
         const sbData = await window.EurekaDB.loadAllFromSupabase();
         if (sbData) {
-          console.log('[Supabase Core] Đã tải toàn bộ 7 bảng dữ liệu thành công ✅');
+          console.log('[Supabase Core] Đã tải toàn bộ dữ liệu an toàn theo phân quyền ✅');
 
           // 1. Tariffs (Bảng phí cước)
           if (sbData.tariffs && typeof sbData.tariffs === 'object') {
@@ -431,17 +471,22 @@
             localStorage.setItem('eureka_tariffs', JSON.stringify(mergedTariffs));
           }
 
-          // 2. Users (Tài khoản người dùng)
-          if (sbData.accounts && sbData.accounts.length > 0) {
+          // 2. Users (Tài khoản người dùng) — CHỈ ADMIN MỚI ĐƯỢC LƯU VÀO LOCALSTORAGE
+          if (isAdmin && sbData.accounts && sbData.accounts.length > 0) {
             localStorage.setItem('eureka_users', JSON.stringify(sbData.accounts));
+          } else {
+            localStorage.removeItem('eureka_users');
           }
 
-          // 3. Buyers (Danh bạ khách hàng)
+          // 3. Buyers (Danh bạ khách hàng) — Phân quyền: User thường chỉ lưu khách hàng của mình
           if (sbData.buyers && Array.isArray(sbData.buyers)) {
-            const cleanBuyers = sbData.buyers.map(b => ({
+            let cleanBuyers = sbData.buyers.map(b => ({
               ...b,
               phone: normalizePhoneNumber(b.phone || '')
             }));
+            if (!isAdmin && currentUsername) {
+              cleanBuyers = cleanBuyers.filter(b => String(b.createdBy || '').toLowerCase().trim() === currentUsername);
+            }
             localStorage.setItem('eureka_buyers', JSON.stringify(cleanBuyers));
           }
 
@@ -455,13 +500,15 @@
             localStorage.setItem('eureka_support_tools', JSON.stringify(sbData.tools));
           }
 
-          // 6. IP Logs (Nhật ký truy cập)
-          if (sbData.ip_logs && Array.isArray(sbData.ip_logs)) {
+          // 6. IP Logs (Nhật ký truy cập) — CHỈ ADMIN MỚI ĐƯỢC LƯU VÀO LOCALSTORAGE
+          if (isAdmin && sbData.ip_logs && Array.isArray(sbData.ip_logs)) {
             localStorage.setItem('eureka_ip_logs', JSON.stringify(sbData.ip_logs));
+          } else {
+            localStorage.removeItem('eureka_ip_logs');
           }
 
-          // 7. Calculation History (Lịch sử tính giá trong 30 ngày)
-          if (sbData.history && Array.isArray(sbData.history) && sbData.history.length > 0) {
+          // 7. Calculation History (Lịch sử tính giá trong 30 ngày) — Phân quyền: User thường chỉ lưu lịch sử của mình
+          if (sbData.history && Array.isArray(sbData.history)) {
             let currentHist = getHistory();
             const existingIds = new Set(currentHist.map(h => String(h.id)));
             sbData.history.forEach(item => {
@@ -475,17 +522,25 @@
               const ts = Number(item.id) || (item.timestamp ? new Date(item.timestamp).getTime() : 0);
               return ts === 0 || (Date.now() - ts < thirtyDaysMs);
             });
+            if (!isAdmin && currentUsername) {
+              currentHist = currentHist.filter(item => {
+                const creator = String(item.createdBy || item.creator || (item.data_payload && item.data_payload.createdBy) || '').toLowerCase().trim();
+                return creator === currentUsername;
+              });
+            }
             currentHist.sort((a, b) => (b.id || 0) - (a.id || 0));
             localStorage.setItem('eureka_1so_history', JSON.stringify(currentHist));
           }
         }
       }
 
-      // Render toàn bộ giao diện Web ngay lập tức
+      // Render toàn bộ giao diện Web an toàn
       try {
-        if (typeof renderUserList === 'function') renderUserList();
-        if (typeof renderIpLogs === 'function') renderIpLogs();
-        if (typeof renderAdminTariffs === 'function') renderAdminTariffs();
+        if (isAdmin) {
+          if (typeof renderUserList === 'function') renderUserList();
+          if (typeof renderIpLogs === 'function') renderIpLogs();
+          if (typeof renderAdminTariffs === 'function') renderAdminTariffs();
+        }
         if (typeof autoUpdateLCLFields === 'function') autoUpdateLCLFields();
         if (typeof updateAllConversionNotes === 'function') updateAllConversionNotes();
         if (typeof renderBuyerDropdown === 'function') renderBuyerDropdown();
@@ -863,8 +918,22 @@
                 let currentHist = getHistory();
                 const existingIds = new Set(currentHist.map(h => String(h.id)));
                 let added = 0;
+                const loggedUserStrTab = sessionStorage.getItem('eureka_logged_in_user');
+                let isAdminTab = false;
+                let currentUsernameTab = '';
+                if (loggedUserStrTab) {
+                  try {
+                    const u = JSON.parse(loggedUserStrTab);
+                    currentUsernameTab = (u.username || '').toLowerCase().trim();
+                    isAdminTab = (u.role === 'admin' || currentUsernameTab === 'admin');
+                  } catch (e) {}
+                }
                 sbHistory.forEach(item => {
                   if (item && item.id && !existingIds.has(String(item.id))) {
+                    if (!isAdminTab && currentUsernameTab) {
+                      const creator = String(item.createdBy || item.creator || (item.data_payload && item.data_payload.createdBy) || '').toLowerCase().trim();
+                      if (creator !== currentUsernameTab) return;
+                    }
                     currentHist.push(item);
                     existingIds.add(String(item.id));
                     added++;
@@ -2988,6 +3057,19 @@
   ];
 
   function getUsers() {
+    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    let isAdmin = false;
+    if (loggedUserStr) {
+      try {
+        const u = JSON.parse(loggedUserStr);
+        isAdmin = (u.role === 'admin' || (u.username || '').toLowerCase() === 'admin');
+      } catch (e) {}
+    }
+    if (!isAdmin) {
+      localStorage.removeItem('eureka_users');
+      return [];
+    }
+
     try {
       const users = localStorage.getItem('eureka_users');
       if (!users) {
@@ -3025,10 +3107,35 @@
   }
 
   function saveUsers(users) {
-    localStorage.setItem('eureka_users', JSON.stringify(users));
+    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    let isAdmin = false;
+    if (loggedUserStr) {
+      try {
+        const u = JSON.parse(loggedUserStr);
+        isAdmin = (u.role === 'admin' || (u.username || '').toLowerCase() === 'admin');
+      } catch (e) {}
+    }
+    if (isAdmin) {
+      localStorage.setItem('eureka_users', JSON.stringify(users));
+    } else {
+      localStorage.removeItem('eureka_users');
+    }
   }
 
   function getIpLogs() {
+    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    let isAdmin = false;
+    if (loggedUserStr) {
+      try {
+        const u = JSON.parse(loggedUserStr);
+        isAdmin = (u.role === 'admin' || (u.username || '').toLowerCase() === 'admin');
+      } catch (e) {}
+    }
+    if (!isAdmin) {
+      localStorage.removeItem('eureka_ip_logs');
+      return [];
+    }
+
     try {
       const logs = localStorage.getItem('eureka_ip_logs');
       const parsed = logs ? JSON.parse(logs) : [];
@@ -3173,10 +3280,23 @@
       status: success ? 'Thành công' : 'Thất bại'
     };
 
-    let logs = getIpLogs();
-    logs.unshift(logEntry);
-    localStorage.setItem('eureka_ip_logs', JSON.stringify(logs));
-    renderIpLogs();
+    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    let isAdmin = false;
+    if (loggedUserStr) {
+      try {
+        const u = JSON.parse(loggedUserStr);
+        isAdmin = (u.role === 'admin' || (u.username || '').toLowerCase() === 'admin');
+      } catch (e) {}
+    }
+
+    if (isAdmin) {
+      let logs = getIpLogs();
+      logs.unshift(logEntry);
+      localStorage.setItem('eureka_ip_logs', JSON.stringify(logs));
+      renderIpLogs();
+    } else {
+      localStorage.removeItem('eureka_ip_logs');
+    }
 
     // 1. Đồng bộ lên Supabase Database riêng
     if (window.EurekaDB && window.EurekaDB.isConfigured()) {
@@ -3347,6 +3467,9 @@
         }
       } else {
         adminBtn.style.display = 'none';
+        // Bảo mật: Xóa ngay lập tức dữ liệu của Admin nếu là tài khoản thường
+        localStorage.removeItem('eureka_users');
+        localStorage.removeItem('eureka_ip_logs');
         if (adminBtn.classList.contains('active')) {
           document.getElementById('tab-btn-lcl').click();
         }

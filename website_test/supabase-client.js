@@ -191,31 +191,58 @@ window.EurekaDB = (function () {
   }
 
   /**
-   * Tải toàn bộ Lịch sử tính toán trong 30 ngày gần nhất từ Supabase về client
+   * Tải toàn bộ Lịch sử tính toán trong 30 ngày gần nhất từ Supabase về client (Phân quyền người dùng)
    */
   async function loadHistoryFromSupabase(days = 30) {
     const client = getClient();
     if (!client) return [];
 
+    let currentUsername = '';
+    let isAdmin = false;
+    try {
+      const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+      if (loggedUserStr) {
+        const u = JSON.parse(loggedUserStr);
+        currentUsername = (u.username || '').toLowerCase().trim();
+        isAdmin = (u.role === 'admin' || currentUsername === 'admin');
+      }
+    } catch (e) {}
+
     try {
       // Mốc thời gian 30 ngày gần nhất
       const sinceDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
-      const { data, error } = await client
+      let query = client
         .from('calculation_history')
         .select('*')
-        .gte('created_at', sinceDate)
+        .gte('created_at', sinceDate);
+
+      // Phân quyền: User thường chỉ tải lịch sử do chính mình tạo
+      if (!isAdmin && currentUsername) {
+        query = query.ilike('created_by', currentUsername);
+      }
+
+      const { data, error } = await query
         .order('created_at', { ascending: false })
-        .limit(2000); // Đảm bảo lấy trọn vẹn toàn bộ các đơn trong 30 ngày
+        .limit(2000);
 
       if (error || !data) {
         console.error('[Supabase] Lỗi tải calculation_history:', error);
         return [];
       }
-      return data.map(h => {
+      let historyList = data.map(h => {
         let p = h.data_payload;
         if (p && p.data_payload) p = p.data_payload;
         return p || h;
       });
+
+      // Lớp lọc bảo mật dự phòng bổ sung trên Client
+      if (!isAdmin && currentUsername) {
+        historyList = historyList.filter(item => {
+          const creator = String(item.createdBy || item.creator || (item.data_payload && item.data_payload.createdBy) || '').toLowerCase().trim();
+          return creator === currentUsername;
+        });
+      }
+      return historyList;
     } catch (e) {
       console.error('[Supabase] Lỗi tải calculation_history:', e);
       return [];
@@ -266,24 +293,56 @@ window.EurekaDB = (function () {
   }
 
   /**
-   * Tải toàn bộ dữ liệu từ 7 bảng trên Supabase về Client (Nguồn sự thật duy nhất)
+   * Tải toàn bộ dữ liệu từ 7 bảng trên Supabase về Client (Phân quyền bảo mật tuyệt đối)
    */
   async function loadAllFromSupabase() {
     const client = getClient();
     if (!client) return null;
 
+    let currentUsername = '';
+    let isAdmin = false;
+    try {
+      const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+      if (loggedUserStr) {
+        const u = JSON.parse(loggedUserStr);
+        currentUsername = (u.username || '').toLowerCase().trim();
+        isAdmin = (u.role === 'admin' || currentUsername === 'admin');
+      }
+    } catch (e) {}
+
     try {
       const sinceDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
       const since7Days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
+      // Chỉ admin mới được truy vấn danh sách toàn bộ users và ip_logs
+      const usersPromise = isAdmin 
+        ? client.from('users').select('*') 
+        : Promise.resolve({ data: [] });
+      const logsPromise = isAdmin 
+        ? client.from('ip_logs').select('*').gte('timestamp', since7Days).order('timestamp', { ascending: false }).limit(200) 
+        : Promise.resolve({ data: [] });
+
+      // Buyers: Nếu là user thường, chỉ query buyers của chính mình
+      let buyersQuery = client.from('buyers').select('*');
+      if (!isAdmin && currentUsername) {
+        buyersQuery = buyersQuery.ilike('created_by', currentUsername);
+      }
+
+      // History: Nếu là user thường, chỉ query history của chính mình
+      let historyQuery = client.from('calculation_history').select('*').gte('created_at', sinceDate);
+      if (!isAdmin && currentUsername) {
+        historyQuery = historyQuery.ilike('created_by', currentUsername);
+      }
+      historyQuery = historyQuery.order('created_at', { ascending: false }).limit(2000);
+
       const [usersRes, buyersRes, historyRes, tariffsRes, sellerRes, toolsRes, logsRes] = await Promise.all([
-        client.from('users').select('*'),
-        client.from('buyers').select('*'),
-        client.from('calculation_history').select('*').gte('created_at', sinceDate).order('created_at', { ascending: false }).limit(2000),
+        usersPromise,
+        buyersQuery,
+        historyQuery,
         client.from('tariffs').select('*').limit(1).maybeSingle(),
         client.from('seller').select('*').limit(1).maybeSingle(),
         client.from('cong_cu_ho_tro').select('*'),
-        client.from('ip_logs').select('*').gte('timestamp', since7Days).order('timestamp', { ascending: false }).limit(200)
+        logsPromise
       ]);
 
       const sellerData = sellerRes.data ? {
@@ -304,40 +363,53 @@ window.EurekaDB = (function () {
         description: t.description || ''
       }));
 
-      const historyData = (historyRes.data || []).map(h => {
+      let historyData = (historyRes.data || []).map(h => {
         let p = h.data_payload;
         if (p && p.data_payload) p = p.data_payload;
         return p || h;
       });
 
+      if (!isAdmin && currentUsername) {
+        historyData = historyData.filter(h => {
+          const creator = String(h.createdBy || h.creator || (h.data_payload && h.data_payload.createdBy) || '').toLowerCase().trim();
+          return creator === currentUsername;
+        });
+      }
+
+      let buyersData = (buyersRes.data || []).map(b => ({
+        name: b.name,
+        address: b.address,
+        taxCode: b.tax_code,
+        phone: b.phone,
+        email: b.email,
+        representative: b.representative,
+        position: b.position,
+        createdBy: b.created_by
+      }));
+
+      if (!isAdmin && currentUsername) {
+        buyersData = buyersData.filter(b => String(b.createdBy || '').toLowerCase().trim() === currentUsername);
+      }
+
       return {
-        accounts: (usersRes.data || []).map(u => ({
+        accounts: isAdmin ? (usersRes.data || []).map(u => ({
           username: u.username,
           displayName: u.display_name,
           password: u.password_hash,
           role: u.role
-        })),
-        buyers: (buyersRes.data || []).map(b => ({
-          name: b.name,
-          address: b.address,
-          taxCode: b.tax_code,
-          phone: b.phone,
-          email: b.email,
-          representative: b.representative,
-          position: b.position,
-          createdBy: b.created_by
-        })),
+        })) : [],
+        buyers: buyersData,
         history: historyData,
         tariffs: tariffsRes.data ? tariffsRes.data.tariff_data : null,
         seller: sellerData,
         tools: toolsData,
-        ip_logs: (logsRes.data || []).map(l => ({
+        ip_logs: isAdmin ? (logsRes.data || []).map(l => ({
           username: l.username,
           status: l.status,
           ip: l.ip,
           details: l.details,
           timestamp: l.timestamp || l.created_at
-        }))
+        })) : []
       };
     } catch (e) {
       console.warn('[Supabase] Failed to load data from Supabase:', e);

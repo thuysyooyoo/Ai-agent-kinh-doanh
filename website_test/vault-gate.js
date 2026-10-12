@@ -310,6 +310,12 @@
       sessionStorage.setItem('eureka_logged_in_user', JSON.stringify(userObj));
       sessionStorage.setItem('eureka_vault_session_token', secretToken);
 
+      // Nếu là tài khoản thường, lập tức dọn sạch dữ liệu admin cũ còn sót lại trong LocalStorage
+      if (userObj.role !== 'admin' && userObj.username.toLowerCase() !== 'admin') {
+        localStorage.removeItem('eureka_users');
+        localStorage.removeItem('eureka_ip_logs');
+      }
+
       // 5. Bung giao diện & chạy ứng dụng
       mountWorkspace(payload);
 
