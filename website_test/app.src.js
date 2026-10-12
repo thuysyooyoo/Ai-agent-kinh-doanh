@@ -3502,12 +3502,23 @@
     });
 
     logoutBtn.addEventListener('click', () => {
-      sessionStorage.removeItem('eureka_logged_in_user');
-      sessionStorage.removeItem('eureka_vault_session_token');
-      showToast('Đã đăng xuất', 'success');
+      showToast('Đang đăng xuất an toàn...', 'success');
       setTimeout(() => {
-        window.location.reload();
-      }, 500);
+        if (window.vaultLogout) {
+          window.vaultLogout();
+        } else {
+          sessionStorage.clear();
+          try {
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+              const k = localStorage.key(i);
+              if (k && (k.startsWith('eureka_') || k.startsWith('sb-'))) {
+                localStorage.removeItem(k);
+              }
+            }
+          } catch (_) {}
+          window.location.reload();
+        }
+      }, 300);
     });
 
     // --- Edit User Modal Handlers ---

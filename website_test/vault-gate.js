@@ -108,10 +108,27 @@
     console.log('[Vault] Đã mở khóa Két sắt thành công. Ứng dụng đã sẵn sàng!');
   }
 
-  // Xử lý Đăng xuất
+  // Dọn dẹp sạch sẽ toàn bộ dữ liệu nhạy cảm trong LocalStorage khi chưa đăng nhập / khi đăng xuất
+  function purgeSensitiveStorage() {
+    try {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('eureka_') || key.startsWith('sb-'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(k => localStorage.removeItem(k));
+      console.log('[Vault] Đã dọn dẹp sạch sẽ dữ liệu nhạy cảm trong LocalStorage.');
+    } catch (e) {
+      console.warn('[Vault] Lỗi dọn dẹp LocalStorage:', e);
+    }
+  }
+
+  // Xử lý Đăng xuất triệt để
   window.vaultLogout = function () {
-    sessionStorage.removeItem('eureka_logged_in_user');
-    sessionStorage.removeItem('eureka_vault_session_token');
+    sessionStorage.clear();
+    purgeSensitiveStorage();
 
     const sb = getSB();
     if (sb && sb.auth) {
@@ -333,6 +350,8 @@
     // 1. Kiểm tra session hiện có
     checkExistingSession().then(restored => {
       if (!restored) {
+        // CHƯA ĐĂNG NHẬP: XÓA SẠCH DỮ LIỆU NHẠY CẢM KHỎI LOCALSTORAGE NGAY LẬP TỨC
+        purgeSensitiveStorage();
         const loginOverlay = document.getElementById('login-overlay');
         if (loginOverlay) loginOverlay.style.display = 'flex';
       }
