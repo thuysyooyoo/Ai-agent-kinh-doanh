@@ -36,7 +36,13 @@ window.EurekaDB = (function () {
     const { url, key } = getSupabaseConfig();
     if (url && key && window.supabase && typeof window.supabase.createClient === 'function') {
       try {
-        _client = window.supabase.createClient(url, key);
+        _client = window.supabase.createClient(url, key, {
+          auth: {
+            storage: window.sessionStorage,
+            persistSession: true,
+            autoRefreshToken: true
+          }
+        });
         return _client;
       } catch (e) {
         console.error('[Supabase] Init error:', e);

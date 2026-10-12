@@ -13,10 +13,30 @@
   const SUPABASE_URL = atob(_c1);
   const SUPABASE_KEY = atob(_c2);
 
+  // Di chuyển và dọn dẹp sạch sẽ toàn bộ token Supabase khỏi LocalStorage sang SessionStorage
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('sb-')) {
+        const val = localStorage.getItem(k);
+        if (val && !sessionStorage.getItem(k)) {
+          sessionStorage.setItem(k, val);
+        }
+        localStorage.removeItem(k);
+      }
+    }
+  } catch (_) {}
+
   let supabaseClient = null;
   function getSB() {
     if (!supabaseClient && window.supabase && window.supabase.createClient) {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: {
+          storage: window.sessionStorage,
+          persistSession: true,
+          autoRefreshToken: true
+        }
+      });
     }
     return supabaseClient;
   }

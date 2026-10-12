@@ -452,6 +452,20 @@
       localStorage.removeItem('eureka_ip_logs');
     }
 
+    // Dọn dẹp sạch sẽ toàn bộ token Supabase sb-* khỏi LocalStorage (chuyển sang SessionStorage)
+    try {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('sb-')) {
+          const val = localStorage.getItem(k);
+          if (val && !sessionStorage.getItem(k)) {
+            sessionStorage.setItem(k, val);
+          }
+          localStorage.removeItem(k);
+        }
+      }
+    } catch (_) {}
+
     try {
       if (window.EurekaDB && window.EurekaDB.isConfigured()) {
         const sbData = await window.EurekaDB.loadAllFromSupabase();
