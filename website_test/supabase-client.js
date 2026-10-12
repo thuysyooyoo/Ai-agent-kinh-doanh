@@ -274,6 +274,7 @@ window.EurekaDB = (function () {
 
     try {
       const sinceDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const since7Days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
       const [usersRes, buyersRes, historyRes, tariffsRes, sellerRes, toolsRes, logsRes] = await Promise.all([
         client.from('users').select('*'),
@@ -282,7 +283,7 @@ window.EurekaDB = (function () {
         client.from('tariffs').select('*').limit(1).maybeSingle(),
         client.from('seller').select('*').limit(1).maybeSingle(),
         client.from('cong_cu_ho_tro').select('*'),
-        client.from('ip_logs').select('*').order('created_at', { ascending: false }).limit(100)
+        client.from('ip_logs').select('*').gte('timestamp', since7Days).order('timestamp', { ascending: false }).limit(200)
       ]);
 
       const sellerData = sellerRes.data ? {

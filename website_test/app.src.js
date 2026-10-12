@@ -3011,7 +3011,15 @@
       const logs = localStorage.getItem('eureka_ip_logs');
       const parsed = logs ? JSON.parse(logs) : [];
       if (!Array.isArray(parsed)) return [];
-      return parsed.filter(l => l && typeof l === 'object');
+      const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      return parsed.filter(l => {
+        if (!l || typeof l !== 'object') return false;
+        if (l.timestamp) {
+          const t = new Date(l.timestamp).getTime();
+          if (!isNaN(t) && t < sevenDaysAgo) return false;
+        }
+        return true;
+      });
     } catch (e) {
       return [];
     }

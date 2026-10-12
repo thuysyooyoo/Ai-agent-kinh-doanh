@@ -136,6 +136,96 @@
     if (passwordInput) passwordInput.value = '';
   };
 
+  // Dò tìm IP và thiết bị người dùng (Đa nguồn, Timeout an toàn không nghẽn mạng)
+  async function detectIpInfo() {
+    let ip = 'Unknown';
+    let details = `Thiết bị: ${navigator.platform || 'Web'}`;
+
+    const endpoints = [
+      {
+        url: 'https://api.ipify.org?format=json',
+        parse: (d) => d.ip,
+        getDetails: () => `IP thuần / Trình duyệt: ${navigator.platform || 'Web'}`
+      },
+      {
+        url: 'https://ipinfo.io/json',
+        parse: (d) => d.ip,
+        getDetails: (d) => `${d.city || ''}, ${d.country || ''} (${d.org || ''})`
+      },
+      {
+        url: 'https://ipapi.co/json/',
+        parse: (d) => d.ip,
+        getDetails: (d) => `${d.city || ''}, ${d.country_name || ''} (${d.org || ''})`
+      }
+    ];
+
+    for (const ep of endpoints) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const res = await fetch(ep.url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          const detectedIp = ep.parse(data);
+          if (detectedIp && detectedIp !== 'Unknown') {
+            ip = detectedIp;
+            details = ep.getDetails(data) || details;
+            break;
+          }
+        }
+      } catch (e) {
+        // Chuyển sang endpoint tiếp theo nếu lỗi/timeout
+      }
+    }
+
+    return { ip, details };
+  }
+
+  // Ghi nhận nhật ký IP lên Supabase (chạy bất đồng bộ ngầm)
+  async function recordAuthLog(username, status) {
+    try {
+      const sb = getSB();
+      if (!sb) return;
+
+      const { ip, details } = await detectIpInfo();
+      const logEntry = {
+        username: username || 'Unknown',
+        status: status,
+        ip: ip,
+        details: details,
+        timestamp: new Date().toISOString()
+      };
+
+      // 1. Ghi trực tiếp vào Supabase ip_logs
+      sb.from('ip_logs').insert(logEntry).then(({ error }) => {
+        if (error) {
+          console.warn('[Vault] ip_logs insert notice:', error.message);
+        } else {
+          console.log('[Vault] Đã ghi nhận IP log:', logEntry.username, logEntry.status, logEntry.ip);
+        }
+      }).catch(err => {
+        console.warn('[Vault] Lỗi gửi log:', err);
+      });
+
+      // 2. Cập nhật vào localStorage để trang Admin hiển thị offline (Lọc giữ lại đúng 7 ngày)
+      try {
+        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        let currentLogs = JSON.parse(localStorage.getItem('eureka_ip_logs') || '[]');
+        currentLogs.unshift(logEntry);
+        currentLogs = currentLogs.filter(l => {
+          if (!l || !l.timestamp) return false;
+          const t = new Date(l.timestamp).getTime();
+          return !isNaN(t) && t >= sevenDaysAgo;
+        });
+        localStorage.setItem('eureka_ip_logs', JSON.stringify(currentLogs));
+      } catch (_) {}
+
+    } catch (e) {
+      console.warn('[Vault] recordAuthLog failed:', e);
+    }
+  }
+
   // Xử lý khi nhấn nút Đăng nhập
   async function handleLoginSubmit(e) {
     if (e) e.preventDefault();
@@ -175,8 +265,13 @@
       });
 
       if (authError || !authData || !authData.session) {
+        // Ghi log Thất bại
+        recordAuthLog(username, 'Thất bại');
         throw new Error('Tên đăng nhập hoặc mật khẩu không chính xác!');
       }
+
+      // Ghi log Thành công (chạy ngầm không chặn giải mã)
+      recordAuthLog(username, 'Thành công');
 
       // 2. Lấy Chìa Khóa Két Sắt từ Supabase Server (Chỉ cấp cho người đã login)
       const { data: secretToken, error: rpcError } = await sb.rpc('get_secure_sheet_token');
