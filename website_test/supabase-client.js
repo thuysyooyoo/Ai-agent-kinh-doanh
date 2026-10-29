@@ -38,7 +38,7 @@ window.EurekaDB = (function () {
       try {
         _client = window.supabase.createClient(url, key, {
           auth: {
-            storage: window.sessionStorage,
+            storage: window.localStorage,
             persistSession: true,
             autoRefreshToken: true
           }

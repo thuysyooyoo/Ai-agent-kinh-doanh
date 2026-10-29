@@ -20,7 +20,7 @@
   let activeCalculationContext = null;
 
   function getCurrentUsername() {
-    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     if (!loggedUserStr) return null;
     try {
       const u = JSON.parse(loggedUserStr);
@@ -61,19 +61,39 @@
     return trimmed.startsWith('https://script.google.com/macros/s/') && trimmed.endsWith('/exec');
   }
 
+  function normalizePhoneNumber(phone) {
+    if (!phone) return '';
+    let str = String(phone).trim();
+    let clean = str.replace(/[\s\.\-]/g, '');
+    if (/^\d{9}$/.test(clean)) {
+      return '0' + clean;
+    }
+    if (/^(\+?84)(\d{9})$/.test(clean)) {
+      return '0' + clean.replace(/^(\+?84)/, '');
+    }
+    return str;
+  }
+
   function getBuyers() {
     try {
       const buyers = localStorage.getItem('eureka_buyers');
       const parsed = buyers ? JSON.parse(buyers) : [];
-      return Array.isArray(parsed) ? parsed : [];
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map(b => ({
+        ...b,
+        phone: normalizePhoneNumber(b.phone || '')
+      }));
     } catch (e) {
       return [];
     }
   }
 
   function saveBuyerLocally(buyer) {
+    if (buyer && buyer.phone) {
+      buyer.phone = normalizePhoneNumber(buyer.phone);
+    }
     let buyers = getBuyers();
-    const index = buyers.findIndex(b => b.name.toLowerCase() === buyer.name.toLowerCase());
+    const index = buyers.findIndex(b => String(b.name || '').toLowerCase() === String(buyer.name || '').toLowerCase());
     if (index !== -1) {
       buyers[index] = buyer;
     } else {
@@ -94,7 +114,22 @@
     // Clear options but keep the first one
     select.innerHTML = '<option value="">-- Nhập Khách Hàng Mới --</option>';
     
-    const buyers = getBuyers();
+    let buyers = getBuyers();
+    const username = getCurrentUsername();
+    let isAdmin = false;
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
+    if (loggedUserStr) {
+      try {
+        const u = JSON.parse(loggedUserStr);
+        isAdmin = (u.role === 'admin' || u.username === 'admin');
+      } catch (e) {}
+    }
+
+    // Phân quyền: User thường chỉ thấy khách hàng do chính mình tạo trong dropdown
+    if (!isAdmin && username) {
+      buyers = buyers.filter(b => String(b.createdBy || '').toLowerCase() === username.toLowerCase());
+    }
+
     buyers.forEach(b => {
       const opt = document.createElement('option');
       opt.value = b.name;
@@ -109,12 +144,12 @@
     if (!tbody) return;
 
     tbody.innerHTML = '';
-    const buyers = getBuyers();
+    let buyers = getBuyers();
     const username = getCurrentUsername();
     
     // Check if role is admin
     let isAdmin = false;
-    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     if (loggedUserStr) {
       try {
         const u = JSON.parse(loggedUserStr);
@@ -122,12 +157,19 @@
       } catch (e) {}
     }
 
+    // Phân quyền: Admin xem toàn bộ, User thường chỉ xem khách hàng do chính mình tạo
+    if (!isAdmin && username) {
+      buyers = buyers.filter(b => String(b.createdBy || '').toLowerCase() === username.toLowerCase());
+    }
+
     if (countEl) {
-      countEl.textContent = `${buyers.length} khách hàng được ghi nhận`;
+      countEl.textContent = isAdmin 
+        ? `${buyers.length} khách hàng trên toàn hệ thống`
+        : `${buyers.length} khách hàng của bạn`;
     }
 
     if (buyers.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary); padding: 15px;">Chưa có khách hàng nào trong danh bạ</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary); padding: 15px;">${isAdmin ? 'Chưa có khách hàng nào trong danh bạ' : 'Bạn chưa có khách hàng nào trong danh bạ. Vui lòng thêm khách hàng mới bên trái.'}</td></tr>`;
       return;
     }
 
@@ -181,7 +223,7 @@
           if (confirm(`Bạn có chắc muốn xóa khách hàng "${b.name}" khỏi danh bạ trên hệ thống?`)) {
             // Remove from local storage
             let allBuyers = getBuyers();
-            allBuyers = allBuyers.filter(x => x.name.toLowerCase() !== b.name.toLowerCase());
+            allBuyers = allBuyers.filter(x => String(x.name || '').toLowerCase() !== String(b.name || '').toLowerCase());
             localStorage.setItem('eureka_buyers', JSON.stringify(allBuyers));
             
             // Re-render
@@ -212,19 +254,34 @@
     });
   }
 
-  function getSheetToken() {
+  let cachedSheetToken = null;
+  async function getSheetToken() {
     const customToken = localStorage.getItem('eureka_sheet_token');
     if (customToken && customToken.trim().length > 0) {
       return customToken.trim();
     }
-    return 'EUREKA_SECURE_TOKEN_2026_X9#mK!';
+    if (cachedSheetToken) return cachedSheetToken;
+    
+    // Nếu dùng Supabase, tải token an toàn từ backend
+    if (window.EurekaDB && window.EurekaDB.isConfigured()) {
+       const client = window.EurekaDB.getClient();
+       if (client) {
+         const { data, error } = await client.rpc('get_secure_sheet_token');
+         if (!error && data) {
+           cachedSheetToken = data;
+           return cachedSheetToken;
+         }
+       }
+    }
+    return ''; // Không trả về mã cứng nữa
   }
 
   async function callSheetAPI(payload, targetUrl = null) {
     const url = targetUrl || GOOGLE_SHEET_URL;
     if (!url) return null;
     try {
-      const enrichedPayload = Object.assign({}, payload, { token: getSheetToken() });
+      const token = await getSheetToken();
+      const enrichedPayload = Object.assign({}, payload, { token: token });
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -243,7 +300,8 @@
     if (!GOOGLE_SHEET_URL) return;
     try {
       const loggedUser = getCurrentUsername();
-      let queryUrl = GOOGLE_SHEET_URL + '?action=get_data&token=' + encodeURIComponent(getSheetToken());
+      const token = await getSheetToken();
+      let queryUrl = GOOGLE_SHEET_URL + '?action=get_data&token=' + encodeURIComponent(token);
       if (loggedUser) {
         queryUrl += '&username=' + encodeURIComponent(loggedUser);
       }
@@ -266,7 +324,18 @@
             localStorage.setItem('eureka_tariffs', JSON.stringify(mergedTariffs));
           }
         }
-        if (cachedData.accounts && cachedData.accounts.length > 0) {
+        const loggedUserStrSheet = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
+        let isAdminSheet = false;
+        let currentUsernameSheet = '';
+        if (loggedUserStrSheet) {
+          try {
+            const u = JSON.parse(loggedUserStrSheet);
+            currentUsernameSheet = (u.username || '').toLowerCase().trim();
+            isAdminSheet = (u.role === 'admin' || currentUsernameSheet === 'admin');
+          } catch (e) {}
+        }
+
+        if (isAdminSheet && cachedData.accounts && cachedData.accounts.length > 0) {
           if (window.EurekaSecurity) {
             try {
               const secRes = await window.EurekaSecurity.migratePasswordsToHash(cachedData.accounts);
@@ -277,9 +346,12 @@
           } else {
             localStorage.setItem('eureka_users', JSON.stringify(cachedData.accounts));
           }
+        } else if (!isAdminSheet) {
+          localStorage.removeItem('eureka_users');
         }
+
         if (cachedData.history && Array.isArray(cachedData.history)) {
-          const normalizedHistory = cachedData.history.map(item => {
+          let normalizedHistory = cachedData.history.map(item => {
             const h = Object.assign({}, item);
             if (!h.shared || typeof h.shared !== 'object') h.shared = {};
             if (!Array.isArray(h.items)) {
@@ -292,20 +364,37 @@
             if (!h.totalValue && h.totalAmount) h.totalValue = Number(h.totalAmount) || 0;
             return h;
           });
+          if (!isAdminSheet && currentUsernameSheet) {
+            normalizedHistory = normalizedHistory.filter(item => {
+              const creator = String(item.createdBy || item.creator || (item.data_payload && item.data_payload.createdBy) || '').toLowerCase().trim();
+              return creator === currentUsernameSheet;
+            });
+          }
           localStorage.setItem('eureka_1so_history', JSON.stringify(normalizedHistory));
         }
         if (cachedData.tools && Array.isArray(cachedData.tools) && cachedData.tools.length > 0) {
           localStorage.setItem('eureka_support_tools', JSON.stringify(cachedData.tools));
         }
         if (cachedData.buyers && Array.isArray(cachedData.buyers)) {
-          localStorage.setItem('eureka_buyers', JSON.stringify(cachedData.buyers));
+          let cleanBuyers = cachedData.buyers.map(b => ({
+            ...b,
+            phone: normalizePhoneNumber(b.phone || '')
+          }));
+          if (!isAdminSheet && currentUsernameSheet) {
+            cleanBuyers = cleanBuyers.filter(b => String(b.createdBy || '').toLowerCase().trim() === currentUsernameSheet);
+          }
+          localStorage.setItem('eureka_buyers', JSON.stringify(cleanBuyers));
         }
         // Tải thông tin bên bán Bên A mặc định từ Sheets
         if (cachedData.seller && typeof cachedData.seller === 'object') {
           const s = cachedData.seller;
           if (s.name && String(s.name).toLowerCase().trim() !== 'address') {
             const currentSeller = getSellerInfo();
-            const mergedSeller = { ...currentSeller, ...s };
+            const mergedSeller = {
+              ...currentSeller,
+              ...s,
+              phone: normalizePhoneNumber(s.phone || currentSeller.phone || '')
+            };
             localStorage.setItem('eureka_contract_seller_info', JSON.stringify(mergedSeller));
             console.log('[Seller] Đã tải thông tin bên bán Bên A từ Google Sheets:', mergedSeller.name);
             
@@ -339,21 +428,121 @@
 
   }
 
-  // ── [BẢO MẬT & ĐỒNG BỘ] Tải toàn bộ dữ liệu từ Google Sheets sau khi đăng nhập ──
+  // ── [KIẾN TRÚC MỚI] Nguồn Sự Thật Duy Nhất: Tải trực tiếp 100% từ Supabase Core ──
   let _dataLoadedAfterLogin = false;
 
-  async function _loadDataAfterLogin() {
-    if (!GOOGLE_SHEET_URL) return;
-    try {
-      if (!_dataLoadedAfterLogin) {
-        _dataLoadedAfterLogin = true;
-        sheetLoadPromise = loadDataFromSheet();
-        await sheetLoadPromise;
-      }
+  async function _loadDataAfterLogin(force = false) {
+    if (_dataLoadedAfterLogin && !force) return;
+    _dataLoadedAfterLogin = true;
+
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
+    let isAdmin = false;
+    let currentUsername = '';
+    if (loggedUserStr) {
       try {
-        if (typeof renderUserList === 'function') renderUserList();
-        if (typeof renderIpLogs === 'function') renderIpLogs();
-        if (typeof renderAdminTariffs === 'function') renderAdminTariffs();
+        const u = JSON.parse(loggedUserStr);
+        currentUsername = (u.username || '').toLowerCase().trim();
+        isAdmin = (u.role === 'admin' || currentUsername === 'admin');
+      } catch (e) {}
+    }
+
+    // Bảo mật: Nếu là tài khoản thường, lập tức dọn dẹp các dữ liệu nhạy cảm khỏi LocalStorage
+    if (!isAdmin) {
+      localStorage.removeItem('eureka_users');
+      localStorage.removeItem('eureka_ip_logs');
+    }
+
+    // Cho phép lưu token Supabase trong LocalStorage để đồng bộ nhiều trình duyệt và duy trì đăng nhập mobile/mini-app
+
+    try {
+      if (window.EurekaDB && window.EurekaDB.isConfigured()) {
+        const sbData = await window.EurekaDB.loadAllFromSupabase();
+        if (sbData) {
+          console.log('[Supabase Core] Đã tải toàn bộ dữ liệu an toàn theo phân quyền ✅');
+
+          // 1. Tariffs (Bảng phí cước)
+          if (sbData.tariffs && typeof sbData.tariffs === 'object') {
+            const currentTariffs = getTariffs();
+            const mergedTariffs = {
+              ...currentTariffs,
+              ...sbData.tariffs,
+              vipRates: { ...(currentTariffs.vipRates || {}), ...(sbData.tariffs.vipRates || {}) },
+              flexibleM3: { ...(currentTariffs.flexibleM3 || {}), ...(sbData.tariffs.flexibleM3 || {}) },
+              flexibleKG: { ...(currentTariffs.flexibleKG || {}), ...(sbData.tariffs.flexibleKG || {}) }
+            };
+            localStorage.setItem('eureka_tariffs', JSON.stringify(mergedTariffs));
+          }
+
+          // 2. Users (Tài khoản người dùng) — CHỈ ADMIN MỚI ĐƯỢC LƯU VÀO LOCALSTORAGE
+          if (isAdmin && sbData.accounts && sbData.accounts.length > 0) {
+            localStorage.setItem('eureka_users', JSON.stringify(sbData.accounts));
+          } else {
+            localStorage.removeItem('eureka_users');
+          }
+
+          // 3. Buyers (Danh bạ khách hàng) — Phân quyền: User thường chỉ lưu khách hàng của mình
+          if (sbData.buyers && Array.isArray(sbData.buyers)) {
+            let cleanBuyers = sbData.buyers.map(b => ({
+              ...b,
+              phone: normalizePhoneNumber(b.phone || '')
+            }));
+            if (!isAdmin && currentUsername) {
+              cleanBuyers = cleanBuyers.filter(b => String(b.createdBy || '').toLowerCase().trim() === currentUsername);
+            }
+            localStorage.setItem('eureka_buyers', JSON.stringify(cleanBuyers));
+          }
+
+          // 4. Seller (Thông tin Bên bán Bên A)
+          if (sbData.seller && typeof sbData.seller === 'object' && sbData.seller.name) {
+            localStorage.setItem('eureka_contract_seller_info', JSON.stringify(sbData.seller));
+          }
+
+          // 5. Tools (Công cụ hỗ trợ)
+          if (sbData.tools && Array.isArray(sbData.tools) && sbData.tools.length > 0) {
+            localStorage.setItem('eureka_support_tools', JSON.stringify(sbData.tools));
+          }
+
+          // 6. IP Logs (Nhật ký truy cập) — CHỈ ADMIN MỚI ĐƯỢC LƯU VÀO LOCALSTORAGE
+          if (isAdmin && sbData.ip_logs && Array.isArray(sbData.ip_logs)) {
+            localStorage.setItem('eureka_ip_logs', JSON.stringify(sbData.ip_logs));
+          } else {
+            localStorage.removeItem('eureka_ip_logs');
+          }
+
+          // 7. Calculation History (Lịch sử tính giá trong 30 ngày) — Phân quyền: User thường chỉ lưu lịch sử của mình
+          if (sbData.history && Array.isArray(sbData.history)) {
+            let currentHist = getHistory();
+            const existingIds = new Set(currentHist.map(h => String(h.id)));
+            sbData.history.forEach(item => {
+              if (item && item.id && !existingIds.has(String(item.id))) {
+                currentHist.push(item);
+                existingIds.add(String(item.id));
+              }
+            });
+            const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+            currentHist = currentHist.filter(item => {
+              const ts = Number(item.id) || (item.timestamp ? new Date(item.timestamp).getTime() : 0);
+              return ts === 0 || (Date.now() - ts < thirtyDaysMs);
+            });
+            if (!isAdmin && currentUsername) {
+              currentHist = currentHist.filter(item => {
+                const creator = String(item.createdBy || item.creator || (item.data_payload && item.data_payload.createdBy) || '').toLowerCase().trim();
+                return creator === currentUsername;
+              });
+            }
+            currentHist.sort((a, b) => (b.id || 0) - (a.id || 0));
+            localStorage.setItem('eureka_1so_history', JSON.stringify(currentHist));
+          }
+        }
+      }
+
+      // Render toàn bộ giao diện Web an toàn
+      try {
+        if (isAdmin) {
+          if (typeof renderUserList === 'function') renderUserList();
+          if (typeof renderIpLogs === 'function') renderIpLogs();
+          if (typeof renderAdminTariffs === 'function') renderAdminTariffs();
+        }
         if (typeof autoUpdateLCLFields === 'function') autoUpdateLCLFields();
         if (typeof updateAllConversionNotes === 'function') updateAllConversionNotes();
         if (typeof renderBuyerDropdown === 'function') renderBuyerDropdown();
@@ -370,10 +559,10 @@
         if (document.getElementById('cfg-seller-bank')) document.getElementById('cfg-seller-bank').value = s.bankAccount || '';
         if (document.getElementById('cfg-seller-bank-name')) document.getElementById('cfg-seller-bank-name').value = s.bankName || '';
       } catch (e) {
-        console.error("Error rendering synced data after login:", e);
+        console.error("Lỗi khi hiển thị dữ liệu sau đăng nhập:", e);
       }
     } catch (err) {
-      console.error("Failed to load sheet data after login:", err);
+      console.error("Lỗi tải dữ liệu Supabase sau đăng nhập:", err);
     }
   }
 
@@ -661,6 +850,9 @@
 
   async function saveTariffs(tariffs) {
     localStorage.setItem('eureka_tariffs', JSON.stringify(tariffs));
+    if (window.EurekaDB && window.EurekaDB.isConfigured()) {
+      window.EurekaDB.syncTariffsToSupabase(tariffs);
+    }
     if (GOOGLE_SHEET_URL) {
       return await callSheetAPI({
         action: 'save_tariffs',
@@ -722,6 +914,41 @@
         
         if (btn.id === 'tab-btn-history') {
           renderHistoryDetailList();
+          if (window.EurekaDB && typeof window.EurekaDB.loadHistoryFromSupabase === 'function') {
+            window.EurekaDB.loadHistoryFromSupabase().then(sbHistory => {
+              if (sbHistory && sbHistory.length > 0) {
+                let currentHist = getHistory();
+                const existingIds = new Set(currentHist.map(h => String(h.id)));
+                let added = 0;
+                const loggedUserStrTab = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
+                let isAdminTab = false;
+                let currentUsernameTab = '';
+                if (loggedUserStrTab) {
+                  try {
+                    const u = JSON.parse(loggedUserStrTab);
+                    currentUsernameTab = (u.username || '').toLowerCase().trim();
+                    isAdminTab = (u.role === 'admin' || currentUsernameTab === 'admin');
+                  } catch (e) {}
+                }
+                sbHistory.forEach(item => {
+                  if (item && item.id && !existingIds.has(String(item.id))) {
+                    if (!isAdminTab && currentUsernameTab) {
+                      const creator = String(item.createdBy || item.creator || (item.data_payload && item.data_payload.createdBy) || '').toLowerCase().trim();
+                      if (creator !== currentUsernameTab) return;
+                    }
+                    currentHist.push(item);
+                    existingIds.add(String(item.id));
+                    added++;
+                  }
+                });
+                if (added > 0) {
+                  currentHist.sort((a, b) => (b.id || 0) - (a.id || 0));
+                  localStorage.setItem('eureka_1so_history', JSON.stringify(currentHist));
+                  renderHistoryDetailList();
+                }
+              }
+            }).catch(() => {});
+          }
         }
         if (btn.id === 'tab-btn-support') {
           renderSupportTools();
@@ -1725,9 +1952,18 @@
       if (!history) return [];
       const parsed = JSON.parse(history);
       if (!Array.isArray(parsed)) return [];
-      const tenDaysMs = 10 * 24 * 60 * 60 * 1000;
-      const filtered = parsed.filter(item => item && typeof item === 'object' && item.id && (Date.now() - item.id < tenDaysMs));
-      filtered.sort((a, b) => b.id - a.id);
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+      const filtered = parsed.filter(item => {
+        if (!item || typeof item !== 'object') return false;
+        const ts = Number(item.id) || (item.timestamp ? new Date(item.timestamp).getTime() : 0);
+        if (ts > 0 && (Date.now() - ts > thirtyDaysMs)) return false;
+        return true;
+      });
+      filtered.sort((a, b) => {
+        const timeA = Number(a.id) || (a.timestamp ? new Date(a.timestamp).getTime() : 0);
+        const timeB = Number(b.id) || (b.timestamp ? new Date(b.timestamp).getTime() : 0);
+        return timeB - timeA;
+      });
       return filtered;
     } catch (e) {
       return [];
@@ -1812,8 +2048,11 @@
 
     let history = getHistory();
     history.unshift(data);
-    const tenDaysMs = 10 * 24 * 60 * 60 * 1000;
-    history = history.filter(item => Date.now() - item.id < tenDaysMs);
+    const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+    history = history.filter(item => {
+      const ts = Number(item.id) || (item.timestamp ? new Date(item.timestamp).getTime() : 0);
+      return ts === 0 || (Date.now() - ts < thirtyDaysMs);
+    });
 
     localStorage.setItem('eureka_1so_history', JSON.stringify(history));
 
@@ -1826,6 +2065,12 @@
         customerName: buyerNameVal,
         data_payload: data,
         creator: data.createdBy
+      }).then(res => {
+        if (res && res.success) {
+          console.log('[Supabase] Đã lưu lịch sử tính toán lên Database thành công ✅');
+        } else if (res && res.error) {
+          console.error('[Supabase] Lỗi khi lưu lịch sử:', res.error);
+        }
       });
     }
 
@@ -1918,7 +2163,7 @@
 
   function renderHistoryDetailList() {
     let history = getHistory();
-    const loggedInUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedInUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let loggedInUser = null;
     let isAdmin = false;
     if (loggedInUserStr) {
@@ -2090,7 +2335,7 @@
     if (!entry) return;
 
     // Kiểm tra phân quyền xem lại
-    const loggedInUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedInUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let loggedInUser = null;
     let isAdmin = false;
     if (loggedInUserStr) {
@@ -2243,7 +2488,7 @@
     if (!itemToDelete) return;
 
     // Kiểm tra phân quyền xóa
-    const loggedInUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedInUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let loggedInUser = null;
     let isAdmin = false;
     if (loggedInUserStr) {
@@ -2814,6 +3059,19 @@
   ];
 
   function getUsers() {
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
+    let isAdmin = false;
+    if (loggedUserStr) {
+      try {
+        const u = JSON.parse(loggedUserStr);
+        isAdmin = (u.role === 'admin' || (u.username || '').toLowerCase() === 'admin');
+      } catch (e) {}
+    }
+    if (!isAdmin) {
+      localStorage.removeItem('eureka_users');
+      return [];
+    }
+
     try {
       const users = localStorage.getItem('eureka_users');
       if (!users) {
@@ -2851,15 +3109,48 @@
   }
 
   function saveUsers(users) {
-    localStorage.setItem('eureka_users', JSON.stringify(users));
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
+    let isAdmin = false;
+    if (loggedUserStr) {
+      try {
+        const u = JSON.parse(loggedUserStr);
+        isAdmin = (u.role === 'admin' || (u.username || '').toLowerCase() === 'admin');
+      } catch (e) {}
+    }
+    if (isAdmin) {
+      localStorage.setItem('eureka_users', JSON.stringify(users));
+    } else {
+      localStorage.removeItem('eureka_users');
+    }
   }
 
   function getIpLogs() {
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
+    let isAdmin = false;
+    if (loggedUserStr) {
+      try {
+        const u = JSON.parse(loggedUserStr);
+        isAdmin = (u.role === 'admin' || (u.username || '').toLowerCase() === 'admin');
+      } catch (e) {}
+    }
+    if (!isAdmin) {
+      localStorage.removeItem('eureka_ip_logs');
+      return [];
+    }
+
     try {
       const logs = localStorage.getItem('eureka_ip_logs');
       const parsed = logs ? JSON.parse(logs) : [];
       if (!Array.isArray(parsed)) return [];
-      return parsed.filter(l => l && typeof l === 'object');
+      const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      return parsed.filter(l => {
+        if (!l || typeof l !== 'object') return false;
+        if (l.timestamp) {
+          const t = new Date(l.timestamp).getTime();
+          if (!isNaN(t) && t < sevenDaysAgo) return false;
+        }
+        return true;
+      });
     } catch (e) {
       return [];
     }
@@ -2871,7 +3162,7 @@
     if (!tbody) return;
 
     // Xác định tài khoản hiện tại đang đăng nhập có phải là admin tối cao (admin) hay không
-    const loggedInUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedInUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let isSuperAdmin = false;
     if (loggedInUserStr) {
       try {
@@ -2991,10 +3282,23 @@
       status: success ? 'Thành công' : 'Thất bại'
     };
 
-    let logs = getIpLogs();
-    logs.unshift(logEntry);
-    localStorage.setItem('eureka_ip_logs', JSON.stringify(logs));
-    renderIpLogs();
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
+    let isAdmin = false;
+    if (loggedUserStr) {
+      try {
+        const u = JSON.parse(loggedUserStr);
+        isAdmin = (u.role === 'admin' || (u.username || '').toLowerCase() === 'admin');
+      } catch (e) {}
+    }
+
+    if (isAdmin) {
+      let logs = getIpLogs();
+      logs.unshift(logEntry);
+      localStorage.setItem('eureka_ip_logs', JSON.stringify(logs));
+      renderIpLogs();
+    } else {
+      localStorage.removeItem('eureka_ip_logs');
+    }
 
     // 1. Đồng bộ lên Supabase Database riêng
     if (window.EurekaDB && window.EurekaDB.isConfigured()) {
@@ -3128,7 +3432,7 @@
       });
     }
 
-    const loggedInUser = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedInUser = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     if (loggedInUser) {
       try {
         const userObj = JSON.parse(loggedInUser);
@@ -3165,6 +3469,9 @@
         }
       } else {
         adminBtn.style.display = 'none';
+        // Bảo mật: Xóa ngay lập tức dữ liệu của Admin nếu là tài khoản thường
+        localStorage.removeItem('eureka_users');
+        localStorage.removeItem('eureka_ip_logs');
         if (adminBtn.classList.contains('active')) {
           document.getElementById('tab-btn-lcl').click();
         }
@@ -3217,9 +3524,13 @@
               const secRes = await window.EurekaSecurity.migratePasswordsToHash(fetchedAccounts);
               fetchedAccounts = secRes.users;
             }
-            localStorage.setItem('eureka_users', JSON.stringify(fetchedAccounts));
+            if (username === 'admin') {
+              localStorage.setItem('eureka_users', JSON.stringify(fetchedAccounts));
+            } else {
+              localStorage.removeItem('eureka_users');
+            }
             users = getUsers();
-            user = users.find(u => u.username === username);
+            user = fetchedAccounts.find(u => u.username === username);
           }
         } catch (fetchErr) {
           console.warn('Lỗi kết nối kiểm tra tài khoản từ Google Sheets:', fetchErr);
@@ -3268,6 +3579,47 @@
           window.EurekaSecurity.resetRateLimit();
         }
 
+        // ── [BẢO MẬT] Đăng nhập ngầm vào Supabase Auth để có quyền ghi dữ liệu ──
+        if (window.EurekaDB && window.EurekaDB.isConfigured()) {
+          try {
+            const client = window.EurekaDB.getClient();
+            if (client) {
+              const virtualEmail = username.includes('@') ? username : `${username}@eureka.local`;
+              let authResult = await client.auth.signInWithPassword({
+                email: virtualEmail,
+                password: password
+              });
+              if (authResult.error) {
+                console.log('[Supabase Auth] Chưa có tài khoản trong Auth, đang tự động khởi tạo...');
+                const rpcRes = await client.rpc('admin_create_user', {
+                  email: virtualEmail,
+                  password: password,
+                  user_metadata: {
+                    displayName: user.displayName || user.username,
+                    role: user.role || 'sale'
+                  }
+                });
+                if (!rpcRes.error) {
+                  authResult = await client.auth.signInWithPassword({
+                    email: virtualEmail,
+                    password: password
+                  });
+                } else {
+                  console.warn('[Supabase Auth] Tạo tài khoản tự động thất bại:', rpcRes.error.message);
+                }
+              }
+              if (!authResult.error) {
+                console.log('[Supabase Auth] Đăng nhập ngầm thành công — Đã xác thực quyền ghi ✅');
+              } else {
+                console.warn('[Supabase Auth] Không thể đăng nhập ngầm:', authResult.error.message);
+              }
+            }
+          } catch (authErr) {
+            console.warn('[Supabase Auth] Lỗi đăng nhập ngầm:', authErr);
+          }
+        }
+
+        localStorage.setItem('eureka_logged_in_user', JSON.stringify(user));
         sessionStorage.setItem('eureka_logged_in_user', JSON.stringify(user));
         setupSession(user);
         showToast(`Chào mừng trở lại, ${user.displayName || user.username}!`, 'success');
@@ -3302,11 +3654,25 @@
     });
 
     logoutBtn.addEventListener('click', () => {
-      sessionStorage.removeItem('eureka_logged_in_user');
-      showToast('Đã đăng xuất', 'success');
+      showToast('Đang đăng xuất an toàn...', 'success');
       setTimeout(() => {
-        window.location.reload();
-      }, 500);
+        if (window.vaultLogout) {
+          window.vaultLogout();
+        } else {
+          localStorage.removeItem('eureka_logged_in_user');
+          localStorage.removeItem('eureka_vault_session_token');
+          sessionStorage.clear();
+          try {
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+              const k = localStorage.key(i);
+              if (k && (k.startsWith('eureka_') || k.startsWith('sb-'))) {
+                localStorage.removeItem(k);
+              }
+            }
+          } catch (_) {}
+          window.location.reload();
+        }
+      }, 300);
     });
 
     // --- Edit User Modal Handlers ---
@@ -3400,7 +3766,7 @@
       if (!user) return;
 
       // Check if current user is super admin
-      const loggedInUserStr = sessionStorage.getItem('eureka_logged_in_user');
+      const loggedInUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
       let isSuperAdmin = false;
       if (loggedInUserStr) {
         try {
@@ -3703,7 +4069,7 @@
     const rateUSD = parseNum(document.getElementById('exchange-rate')?.value) || 25900;
     const rateRMB = parseNum(document.getElementById('exchange-rate-rmb')?.value) || 3600;
 
-    const loggedUser = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedUser = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let creator = 'Quản trị viên';
     if (loggedUser) {
       try {
@@ -4305,6 +4671,9 @@
 
   async function saveSupportTools(tools) {
     localStorage.setItem('eureka_support_tools', JSON.stringify(tools));
+    if (window.EurekaDB && window.EurekaDB.isConfigured()) {
+      window.EurekaDB.syncSupportToolsToSupabase(tools);
+    }
     if (GOOGLE_SHEET_URL) {
       try {
         const res = await callSheetAPI({
@@ -4408,7 +4777,7 @@
     // Open Modal
     profileBtn.addEventListener('click', () => {
       const username = getCurrentUsername() || 'sales';
-      const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+      const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
       let displayName = username;
       let role = 'user';
       if (loggedUserStr) {
@@ -4906,6 +5275,9 @@
 
   async function saveSellerInfo(info) {
     localStorage.setItem('eureka_contract_seller_info', JSON.stringify(info));
+    if (window.EurekaDB && window.EurekaDB.isConfigured()) {
+      window.EurekaDB.syncSellerToSupabase(info);
+    }
     if (GOOGLE_SHEET_URL) {
       try {
         const res = await callSheetAPI({
@@ -5302,7 +5674,7 @@ ${content}
   function getBuyerInitials(name) {
     if (!name) return 'KH';
     // Remove accents and normalize
-    var str = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    var str = String(name).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     // Replace non-alphanumeric with spaces
     str = str.replace(/[^a-z0-9\s]/g, ' ');
     // Split into words
@@ -5730,8 +6102,8 @@ ${content}
         };
 
         // If editing and changed name, delete the old name on Google Sheets first
-        if (oldName && oldName.toLowerCase() !== name.toLowerCase()) {
-          let allBuyers = getBuyers().filter(x => x.name.toLowerCase() !== oldName.toLowerCase());
+        if (oldName && String(oldName).toLowerCase() !== String(name).toLowerCase()) {
+          let allBuyers = getBuyers().filter(x => String(x.name || '').toLowerCase() !== String(oldName).toLowerCase());
           localStorage.setItem('eureka_buyers', JSON.stringify(allBuyers));
           
           callSheetAPI({
@@ -6059,7 +6431,43 @@ ${content}
     // ── [BẢO MẬT] Dữ liệu từ Google Sheets được đồng bộ sau khi đăng nhập qua hàm _loadDataAfterLogin() ──
 
     // Initialize PWA Setup
+    
+    // ── Xử lý nút Làm mới / Tải lại dữ liệu (Dành cho Mobile & Mini App không có phím Ctrl+F5) ──
+    const appRefreshBtn = document.getElementById('app-refresh-btn');
+    if (appRefreshBtn) {
+      appRefreshBtn.addEventListener('click', async () => {
+        showToast('Đang làm mới ứng dụng và xóa cache...', 'info');
+        try {
+          if ('caches' in window) {
+            const cacheKeys = await caches.keys();
+            await Promise.all(cacheKeys.map(k => caches.delete(k)));
+          }
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            for (let r of regs) await r.unregister();
+          }
+        } catch (_) {}
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 500);
+      });
+    }
+
     initPWA();
+
+    // ── Realtime & Background Auto-Sync ──
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'))) {
+        console.log('[Realtime] Quay lại tab, tự động kiểm tra và đồng bộ dữ liệu mới nhất...');
+        _loadDataAfterLogin(true);
+      }
+    });
+
+    setInterval(() => {
+      if ((localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'))) {
+        _loadDataAfterLogin(true);
+      }
+    }, 60000);
   }
 
   // ── PWA & Push Notifications Setup ──

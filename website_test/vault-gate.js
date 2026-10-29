@@ -1,6 +1,7 @@
 /* ========================================================
    EUREKA LOGISTICS — Zero-Trust Vault Gatekeeper
    vault-gate.js — Giải mã AES-256-GCM & Kích hoạt ứng dụng
+   Hỗ trợ đa trình duyệt, đa thiết bị, điện thoại & Mini App
    ======================================================== */
 
 (function () {
@@ -13,30 +14,20 @@
   const SUPABASE_URL = atob(_c1);
   const SUPABASE_KEY = atob(_c2);
 
-  // Di chuyển và dọn dẹp sạch sẽ toàn bộ token Supabase khỏi LocalStorage sang SessionStorage
-  try {
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('sb-')) {
-        const val = localStorage.getItem(k);
-        if (val && !sessionStorage.getItem(k)) {
-          sessionStorage.setItem(k, val);
-        }
-        localStorage.removeItem(k);
-      }
-    }
-  } catch (_) {}
-
   let supabaseClient = null;
   function getSB() {
-    if (!supabaseClient && window.supabase && window.supabase.createClient) {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-        auth: {
-          storage: window.sessionStorage,
-          persistSession: true,
-          autoRefreshToken: true
-        }
-      });
+    if (!supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
+      try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+          auth: {
+            storage: window.localStorage,
+            persistSession: true,
+            autoRefreshToken: true
+          }
+        });
+      } catch (e) {
+        console.warn('[Vault] Supabase SDK client init notice:', e);
+      }
     }
     return supabaseClient;
   }
@@ -128,7 +119,7 @@
     console.log('[Vault] Đã mở khóa Két sắt thành công. Ứng dụng đã sẵn sàng!');
   }
 
-  // Dọn dẹp sạch sẽ toàn bộ dữ liệu nhạy cảm trong LocalStorage khi chưa đăng nhập / khi đăng xuất
+  // Dọn dẹp sạch sẽ toàn bộ dữ liệu nhạy cảm trong LocalStorage khi đăng xuất
   function purgeSensitiveStorage() {
     try {
       const keysToRemove = [];
@@ -139,7 +130,7 @@
         }
       }
       keysToRemove.forEach(k => localStorage.removeItem(k));
-      console.log('[Vault] Đã dọn dẹp sạch sẽ dữ liệu nhạy cảm trong LocalStorage.');
+      console.log('[Vault] Đã dọn dẹp sạch sẽ dữ liệu nhạy cảm khi đăng xuất.');
     } catch (e) {
       console.warn('[Vault] Lỗi dọn dẹp LocalStorage:', e);
     }
@@ -147,12 +138,14 @@
 
   // Xử lý Đăng xuất triệt để
   window.vaultLogout = function () {
+    localStorage.removeItem('eureka_logged_in_user');
+    localStorage.removeItem('eureka_vault_session_token');
     sessionStorage.clear();
     purgeSensitiveStorage();
 
     const sb = getSB();
     if (sb && sb.auth) {
-      sb.auth.signOut().catch(() => {});
+      try { sb.auth.signOut(); } catch (_) {}
     }
 
     const appRoot = document.getElementById('app-root');
@@ -222,9 +215,6 @@
   // Ghi nhận nhật ký IP lên Supabase (chạy bất đồng bộ ngầm)
   async function recordAuthLog(username, status) {
     try {
-      const sb = getSB();
-      if (!sb) return;
-
       const { ip, details } = await detectIpInfo();
       const logEntry = {
         username: username || 'Unknown',
@@ -234,20 +224,25 @@
         timestamp: new Date().toISOString()
       };
 
-      // 1. Ghi trực tiếp vào Supabase ip_logs
-      sb.from('ip_logs').insert(logEntry).then(({ error }) => {
-        if (error) {
-          console.warn('[Vault] ip_logs insert notice:', error.message);
-        } else {
-          console.log('[Vault] Đã ghi nhận IP log:', logEntry.username, logEntry.status, logEntry.ip);
-        }
+      // 1. Ghi qua REST API trực tiếp (không phụ thuộc SDK)
+      fetch(`${SUPABASE_URL}/rest/v1/ip_logs`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(logEntry)
+      }).then(() => {
+        console.log('[Vault] Đã ghi nhận IP log:', logEntry.username, logEntry.status, logEntry.ip);
       }).catch(err => {
         console.warn('[Vault] Lỗi gửi log:', err);
       });
 
       // 2. Cập nhật vào localStorage CHỈ KHI là tài khoản Admin (Lọc giữ lại đúng 7 ngày)
       try {
-        if (username.toLowerCase() === 'admin') {
+        if (username && username.toLowerCase() === 'admin') {
           const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
           let currentLogs = JSON.parse(localStorage.getItem('eureka_ip_logs') || '[]');
           currentLogs.unshift(logEntry);
@@ -265,6 +260,80 @@
     } catch (e) {
       console.warn('[Vault] recordAuthLog failed:', e);
     }
+  }
+
+  // Xác thực đăng nhập qua Supabase SDK hoặc Native REST API trực tiếp
+  async function performSignIn(email, password) {
+    // 1. Thử qua Supabase SDK nếu đã tải xong
+    try {
+      const sb = getSB();
+      if (sb && sb.auth && typeof sb.auth.signInWithPassword === 'function') {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        if (!error && data && data.session) {
+          return {
+            user: data.user,
+            accessToken: data.session.access_token
+          };
+        }
+        if (error) {
+          // Báo lỗi sai mật khẩu trực tiếp
+          throw new Error('Tên đăng nhập hoặc mật khẩu không chính xác!');
+        }
+      }
+    } catch (sdkErr) {
+      if (sdkErr.message && sdkErr.message.includes('chính xác')) {
+        throw sdkErr;
+      }
+      console.warn('[Vault] Supabase SDK chưa sẵn sàng, tự động chuyển sang REST API trực tiếp:', sdkErr);
+    }
+
+    // 2. Dự phòng trực tiếp qua Native REST API (luôn chạy tốt 100% trên điện thoại & mini app)
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!resp.ok) {
+      throw new Error('Tên đăng nhập hoặc mật khẩu không chính xác!');
+    }
+
+    const authData = await resp.json();
+    return {
+      user: authData.user,
+      accessToken: authData.access_token
+    };
+  }
+
+  // Lấy Chìa Khóa Két Sắt từ Supabase Server (Chỉ cấp cho người đã login)
+  async function fetchSecretToken(accessToken) {
+    try {
+      const sb = getSB();
+      if (sb && sb.rpc && typeof sb.rpc === 'function') {
+        const { data, error } = await sb.rpc('get_secure_sheet_token');
+        if (!error && data) return data;
+      }
+    } catch (_) {}
+
+    // Dự phòng qua REST API
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_secure_sheet_token`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: '{}'
+    });
+
+    if (!resp.ok) {
+      throw new Error('Không thể lấy chìa khóa bảo mật từ máy chủ.');
+    }
+
+    return await resp.json();
   }
 
   // Xử lý khi nhấn nút Đăng nhập
@@ -296,27 +365,17 @@
     }
 
     try {
-      const sb = getSB();
       const email = username.includes('@') ? username : `${username.toLowerCase()}@eureka.local`;
 
-      // 1. Xác thực tài khoản với Supabase
-      const { data: authData, error: authError } = await sb.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-
-      if (authError || !authData || !authData.session) {
-        // Ghi log Thất bại
-        recordAuthLog(username, 'Thất bại');
-        throw new Error('Tên đăng nhập hoặc mật khẩu không chính xác!');
-      }
+      // 1. Xác thực tài khoản với Supabase (Tự động fallback REST API chống lỗi 'reading auth')
+      const authResult = await performSignIn(email, password);
 
       // Ghi log Thành công (chạy ngầm không chặn giải mã)
       recordAuthLog(username, 'Thành công');
 
-      // 2. Lấy Chìa Khóa Két Sắt từ Supabase Server (Chỉ cấp cho người đã login)
-      const { data: secretToken, error: rpcError } = await sb.rpc('get_secure_sheet_token');
-      if (rpcError || !secretToken) {
+      // 2. Lấy Chìa Khóa Két Sắt từ Supabase Server
+      const secretToken = await fetchSecretToken(authResult.accessToken);
+      if (!secretToken) {
         throw new Error('Không thể lấy chìa khóa bảo mật từ máy chủ.');
       }
 
@@ -324,13 +383,15 @@
       if (submitBtn) submitBtn.textContent = 'Đang mở khóa Két sắt...';
       const payload = await decryptVault(secretToken);
 
-      // 4. Lưu phiên vào sessionStorage
+      // 4. Lưu phiên vào cả localStorage và sessionStorage (Duy trì bền vững trên mọi trình duyệt & mini app)
       const userObj = {
         username: username,
-        displayName: (authData.user && authData.user.user_metadata && authData.user.user_metadata.displayName) || username,
-        role: (authData.user && authData.user.user_metadata && authData.user.user_metadata.role) || (username.toLowerCase() === 'admin' ? 'admin' : 'user')
+        displayName: (authResult.user && authResult.user.user_metadata && authResult.user.user_metadata.displayName) || username,
+        role: (authResult.user && authResult.user.user_metadata && authResult.user.user_metadata.role) || (username.toLowerCase() === 'admin' ? 'admin' : 'user')
       };
 
+      localStorage.setItem('eureka_logged_in_user', JSON.stringify(userObj));
+      localStorage.setItem('eureka_vault_session_token', secretToken);
       sessionStorage.setItem('eureka_logged_in_user', JSON.stringify(userObj));
       sessionStorage.setItem('eureka_vault_session_token', secretToken);
 
@@ -345,6 +406,7 @@
 
     } catch (err) {
       console.error('[Vault Auth Error]:', err);
+      recordAuthLog(username, 'Thất bại');
       if (errorMsg) {
         errorMsg.textContent = err.message || 'Đăng nhập không thành công!';
         errorMsg.style.display = 'block';
@@ -356,15 +418,20 @@
     }
   }
 
-  // Khôi phục phiên làm việc (F5 tải lại trang)
+  // Khôi phục phiên làm việc (F5 tải lại trang, mở tab mới, mở trên điện thoại / mini app)
   async function checkExistingSession() {
-    const savedUser = sessionStorage.getItem('eureka_logged_in_user');
-    const savedToken = sessionStorage.getItem('eureka_vault_session_token');
+    const savedUser = localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user');
+    const savedToken = localStorage.getItem('eureka_vault_session_token') || sessionStorage.getItem('eureka_vault_session_token');
 
     if (savedUser && savedToken) {
       try {
-        console.log('[Vault] Khôi phục phiên làm việc từ bộ nhớ đệm...');
+        console.log('[Vault] Khôi phục phiên làm việc từ bộ nhớ đệm (hỗ trợ đa trình duyệt & mini app)...');
         const payload = await decryptVault(savedToken);
+        // Đồng bộ dữ liệu session cho cả 2 kho lưu trữ
+        sessionStorage.setItem('eureka_logged_in_user', savedUser);
+        sessionStorage.setItem('eureka_vault_session_token', savedToken);
+        localStorage.setItem('eureka_logged_in_user', savedUser);
+        localStorage.setItem('eureka_vault_session_token', savedToken);
         mountWorkspace(payload);
         return true;
       } catch (e) {
@@ -380,14 +447,31 @@
     // 1. Kiểm tra session hiện có
     checkExistingSession().then(restored => {
       if (!restored) {
-        // CHƯA ĐĂNG NHẬP: XÓA SẠCH DỮ LIỆU NHẠY CẢM KHỎI LOCALSTORAGE NGAY LẬP TỨC
-        purgeSensitiveStorage();
+        // Chưa đăng nhập: Chỉ hiển thị form đăng nhập, KHÔNG xóa oan dữ liệu localStorage
         const loginOverlay = document.getElementById('login-overlay');
         if (loginOverlay) loginOverlay.style.display = 'flex';
       }
     });
 
-    // 2. Lắng nghe form submit
+    // 2. Hỗ trợ nút làm mới / xóa cache cho điện thoại và mini app (không cần phím Ctrl+F5)
+    const refreshBtn = document.getElementById('btn-force-refresh');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', async () => {
+        try {
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+          }
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            for (let r of regs) await r.unregister();
+          }
+        } catch (_) {}
+        window.location.reload(true);
+      });
+    }
+
+    // 3. Lắng nghe form submit
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
       loginForm.addEventListener('submit', handleLoginSubmit);

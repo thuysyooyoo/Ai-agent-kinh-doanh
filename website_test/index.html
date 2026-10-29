@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-title" content="Eureka 1 Sổ">
   <link rel="apple-touch-icon" href="logo.jpg">
   
-  <link rel="stylesheet" href="style.css?v=2.2.4">
+  <link rel="stylesheet" href="style.css?v=2.2.5">
   <script>
     window.onerror = function(message, source, lineno, colno, error) {
       if (message === 'Script error.' || lineno === 0 || !source) {
@@ -70,6 +70,11 @@
         <div id="login-error-msg" style="color:var(--danger); font-size:0.8rem; font-weight:600; text-align:center; margin-top:12px; display:none;">
           Tên đăng nhập hoặc mật khẩu không chính xác!
         </div>
+        <div style="text-align:center; margin-top:16px;">
+          <button type="button" id="btn-force-refresh" style="background:none; border:none; color:var(--text-muted, #888); font-size:0.8rem; cursor:pointer; text-decoration:underline; padding:6px 12px;">
+            🔄 Tải lại dữ liệu mới nhất (Xóa cache điện thoại)
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -80,7 +85,7 @@
   <!-- Supabase Auth Core -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Encrypted Vault Data & Gatekeeper -->
-  <script src="vault.data.js?v=2.2.4"></script>
-  <script src="vault-gate.js?v=2.2.4"></script>
+  <script src="vault.data.js?v=2.2.5"></script>
+  <script src="vault-gate.js?v=2.2.5"></script>
 </body>
 </html>

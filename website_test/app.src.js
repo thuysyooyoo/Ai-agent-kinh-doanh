@@ -20,7 +20,7 @@
   let activeCalculationContext = null;
 
   function getCurrentUsername() {
-    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     if (!loggedUserStr) return null;
     try {
       const u = JSON.parse(loggedUserStr);
@@ -117,7 +117,7 @@
     let buyers = getBuyers();
     const username = getCurrentUsername();
     let isAdmin = false;
-    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     if (loggedUserStr) {
       try {
         const u = JSON.parse(loggedUserStr);
@@ -149,7 +149,7 @@
     
     // Check if role is admin
     let isAdmin = false;
-    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     if (loggedUserStr) {
       try {
         const u = JSON.parse(loggedUserStr);
@@ -324,7 +324,7 @@
             localStorage.setItem('eureka_tariffs', JSON.stringify(mergedTariffs));
           }
         }
-        const loggedUserStrSheet = sessionStorage.getItem('eureka_logged_in_user');
+        const loggedUserStrSheet = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
         let isAdminSheet = false;
         let currentUsernameSheet = '';
         if (loggedUserStrSheet) {
@@ -435,7 +435,7 @@
     if (_dataLoadedAfterLogin && !force) return;
     _dataLoadedAfterLogin = true;
 
-    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let isAdmin = false;
     let currentUsername = '';
     if (loggedUserStr) {
@@ -452,19 +452,7 @@
       localStorage.removeItem('eureka_ip_logs');
     }
 
-    // Dọn dẹp sạch sẽ toàn bộ token Supabase sb-* khỏi LocalStorage (chuyển sang SessionStorage)
-    try {
-      for (let i = localStorage.length - 1; i >= 0; i--) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith('sb-')) {
-          const val = localStorage.getItem(k);
-          if (val && !sessionStorage.getItem(k)) {
-            sessionStorage.setItem(k, val);
-          }
-          localStorage.removeItem(k);
-        }
-      }
-    } catch (_) {}
+    // Cho phép lưu token Supabase trong LocalStorage để đồng bộ nhiều trình duyệt và duy trì đăng nhập mobile/mini-app
 
     try {
       if (window.EurekaDB && window.EurekaDB.isConfigured()) {
@@ -932,7 +920,7 @@
                 let currentHist = getHistory();
                 const existingIds = new Set(currentHist.map(h => String(h.id)));
                 let added = 0;
-                const loggedUserStrTab = sessionStorage.getItem('eureka_logged_in_user');
+                const loggedUserStrTab = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
                 let isAdminTab = false;
                 let currentUsernameTab = '';
                 if (loggedUserStrTab) {
@@ -2175,7 +2163,7 @@
 
   function renderHistoryDetailList() {
     let history = getHistory();
-    const loggedInUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedInUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let loggedInUser = null;
     let isAdmin = false;
     if (loggedInUserStr) {
@@ -2347,7 +2335,7 @@
     if (!entry) return;
 
     // Kiểm tra phân quyền xem lại
-    const loggedInUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedInUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let loggedInUser = null;
     let isAdmin = false;
     if (loggedInUserStr) {
@@ -2500,7 +2488,7 @@
     if (!itemToDelete) return;
 
     // Kiểm tra phân quyền xóa
-    const loggedInUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedInUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let loggedInUser = null;
     let isAdmin = false;
     if (loggedInUserStr) {
@@ -3071,7 +3059,7 @@
   ];
 
   function getUsers() {
-    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let isAdmin = false;
     if (loggedUserStr) {
       try {
@@ -3121,7 +3109,7 @@
   }
 
   function saveUsers(users) {
-    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let isAdmin = false;
     if (loggedUserStr) {
       try {
@@ -3137,7 +3125,7 @@
   }
 
   function getIpLogs() {
-    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let isAdmin = false;
     if (loggedUserStr) {
       try {
@@ -3174,7 +3162,7 @@
     if (!tbody) return;
 
     // Xác định tài khoản hiện tại đang đăng nhập có phải là admin tối cao (admin) hay không
-    const loggedInUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedInUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let isSuperAdmin = false;
     if (loggedInUserStr) {
       try {
@@ -3294,7 +3282,7 @@
       status: success ? 'Thành công' : 'Thất bại'
     };
 
-    const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let isAdmin = false;
     if (loggedUserStr) {
       try {
@@ -3444,7 +3432,7 @@
       });
     }
 
-    const loggedInUser = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedInUser = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     if (loggedInUser) {
       try {
         const userObj = JSON.parse(loggedInUser);
@@ -3631,6 +3619,7 @@
           }
         }
 
+        localStorage.setItem('eureka_logged_in_user', JSON.stringify(user));
         sessionStorage.setItem('eureka_logged_in_user', JSON.stringify(user));
         setupSession(user);
         showToast(`Chào mừng trở lại, ${user.displayName || user.username}!`, 'success');
@@ -3670,6 +3659,8 @@
         if (window.vaultLogout) {
           window.vaultLogout();
         } else {
+          localStorage.removeItem('eureka_logged_in_user');
+          localStorage.removeItem('eureka_vault_session_token');
           sessionStorage.clear();
           try {
             for (let i = localStorage.length - 1; i >= 0; i--) {
@@ -3775,7 +3766,7 @@
       if (!user) return;
 
       // Check if current user is super admin
-      const loggedInUserStr = sessionStorage.getItem('eureka_logged_in_user');
+      const loggedInUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
       let isSuperAdmin = false;
       if (loggedInUserStr) {
         try {
@@ -4078,7 +4069,7 @@
     const rateUSD = parseNum(document.getElementById('exchange-rate')?.value) || 25900;
     const rateRMB = parseNum(document.getElementById('exchange-rate-rmb')?.value) || 3600;
 
-    const loggedUser = sessionStorage.getItem('eureka_logged_in_user');
+    const loggedUser = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
     let creator = 'Quản trị viên';
     if (loggedUser) {
       try {
@@ -4786,7 +4777,7 @@
     // Open Modal
     profileBtn.addEventListener('click', () => {
       const username = getCurrentUsername() || 'sales';
-      const loggedUserStr = sessionStorage.getItem('eureka_logged_in_user');
+      const loggedUserStr = (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'));
       let displayName = username;
       let role = 'user';
       if (loggedUserStr) {
@@ -6440,18 +6431,40 @@ ${content}
     // ── [BẢO MẬT] Dữ liệu từ Google Sheets được đồng bộ sau khi đăng nhập qua hàm _loadDataAfterLogin() ──
 
     // Initialize PWA Setup
+    
+    // ── Xử lý nút Làm mới / Tải lại dữ liệu (Dành cho Mobile & Mini App không có phím Ctrl+F5) ──
+    const appRefreshBtn = document.getElementById('app-refresh-btn');
+    if (appRefreshBtn) {
+      appRefreshBtn.addEventListener('click', async () => {
+        showToast('Đang làm mới ứng dụng và xóa cache...', 'info');
+        try {
+          if ('caches' in window) {
+            const cacheKeys = await caches.keys();
+            await Promise.all(cacheKeys.map(k => caches.delete(k)));
+          }
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            for (let r of regs) await r.unregister();
+          }
+        } catch (_) {}
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 500);
+      });
+    }
+
     initPWA();
 
     // ── Realtime & Background Auto-Sync ──
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && sessionStorage.getItem('eureka_logged_in_user')) {
+      if (!document.hidden && (localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'))) {
         console.log('[Realtime] Quay lại tab, tự động kiểm tra và đồng bộ dữ liệu mới nhất...');
         _loadDataAfterLogin(true);
       }
     });
 
     setInterval(() => {
-      if (sessionStorage.getItem('eureka_logged_in_user')) {
+      if ((localStorage.getItem('eureka_logged_in_user') || sessionStorage.getItem('eureka_logged_in_user'))) {
         _loadDataAfterLogin(true);
       }
     }, 60000);
